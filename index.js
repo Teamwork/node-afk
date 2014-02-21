@@ -12,7 +12,7 @@ function tick(callback) {
 			if(error) {
 				throw stderr;
 			}
-			callback(parseInt(stdout, 10) * 1000);
+			callback(parseInt(stdout, 10));
 		});
 	}
 	else if (/linux/.test(process.platform)) {
