@@ -2,9 +2,8 @@ var win_idle = require('./lib/win-idle');
 var exec = require('child_process').exec;
 
 function tick(callback) {
-	var ms;
 	callback = callback || function (){};
-	
+
 	if (/^win/.test(process.platform)) {
 		callback(win_idle.idle());
 	}
