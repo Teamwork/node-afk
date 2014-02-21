@@ -5,15 +5,15 @@ Provides seconds since the user was last active
 
 ## Install
 ```
-npm install node-idle
+npm install afk
 ```
 
 ## Example
 ```javascript
-var idle = require('idle');
+var afk = require('afk');
 
 setInterval(function(){
-	idle.tick(function(ms){
+	afk.tick(function(ms){
 		console.log(ms);
 	});	
 }, 1000)
