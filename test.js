@@ -1,5 +1,7 @@
 var idle = require('./index.js');
 
-idle.tick(function(ms){
-	console.log(ms);
-});
+setInterval(function(){
+	idle.tick(function(ms){
+		console.log(ms);
+	});	
+}, 1000)

@@ -1,5 +1,5 @@
-var win_idle = require('./lib/idle');
 var exec = require('child_process').exec;
+if (/^win/.test(process.platform)) var win_idle = require('./lib/idle');
 
 function tick(callback) {
 	callback = callback || function (){};
@@ -12,7 +12,7 @@ function tick(callback) {
 			if(error) {
 				throw stderr;
 			}
-			callback(parseInt(stdout, 10));
+			callback(parseInt(stdout, 10) * 1000);
 		});
 	}
 	else if (/linux/.test(process.platform)) {
