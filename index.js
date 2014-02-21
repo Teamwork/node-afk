@@ -5,7 +5,7 @@ function tick(callback) {
 	callback = callback || function (){};
 
 	if (/^win/.test(process.platform)) {
-		callback(win_idle.idle());
+		callback(Math.round(win_idle.idle() / 1000));
 	}
 	else if (/darwin/.test(process.platform)) {
 		exec('/usr/sbin/ioreg -c IOHIDSystem | /usr/bin/awk \'/HIDIdleTime/ {print int($NF/1000000000); exit}\'', function (error, stdout, stderr) {
