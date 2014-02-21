@@ -1,0 +1,22 @@
+{
+  "name": "idle",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "description": "Provides milliseconds since the user was last active",
+  "keywords": [
+    "user idle",
+    "mouse",
+    "keyboard",
+    "user inactive"
+  ],
+  "author": "Donal Linehan <me@don.al>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/TeamworkPM/node-idle.git"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "main": "index.js"
+}
