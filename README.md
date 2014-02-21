@@ -1,4 +1,4 @@
-node-idle
+node-afk
 =========
 
 Provides seconds since the user was last active
