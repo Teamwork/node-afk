@@ -23,5 +23,4 @@ function tick(callback) {
 	}
 }
 
-
 exports.tick = tick
