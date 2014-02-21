@@ -17,14 +17,14 @@ function tick(callback) {
 		});
 	}
 	else if (/linux/.test(process.platform)) {
-		getLinuxIdleTime(callback);
+		callback(0);
 	}
 	else {
 		callback(0);
 	}
 }
 
-
+// nooooope this doesn't work at all
 function getLinuxIdleTime (callback) {
 	var string = 'USER IDLE\ndonal 13.75s\ndonal 27:35\ndonal 19:43\ndonal 7.00s';
 	exec('w | awk "{if (NR!=1) {print $1,$5 }}"\'', function (error, stdout, stderr) {
