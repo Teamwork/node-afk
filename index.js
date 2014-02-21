@@ -1,4 +1,4 @@
-var win_idle = require('./lib/win-idle');
+var win_idle = require('./lib/idle');
 var exec = require('child_process').exec;
 
 function tick(callback) {
