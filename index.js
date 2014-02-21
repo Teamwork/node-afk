@@ -8,7 +8,8 @@ function tick(callback) {
 		callback(Math.round(win_idle.idle() / 1000));
 	}
 	else if (/darwin/.test(process.platform)) {
-		exec('/usr/sbin/ioreg -c IOHIDSystem | /usr/bin/awk \'/HIDIdleTime/ {print int($NF/1000000000); exit}\'', function (error, stdout, stderr) {
+		var cmd = '/usr/sbin/ioreg -c IOHIDSystem | /usr/bin/awk \'/HIDIdleTime/ {print int($NF/1000000000); exit}\'';
+		exec(cmd, function (error, stdout, stderr) {
 			if(error) {
 				throw stderr;
 			}
