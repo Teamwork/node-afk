@@ -12,11 +12,12 @@ npm install afk
 ```javascript
 var afk = require('afk');
 
-setInterval(function(){
-	afk.tick(function(ms){
-		console.log(ms);
-	});	
-}, 1000)
+var seconds = 10;
+
+var listenerId = afk.addListener(seconds, function(e) {
+	console.log(e)
+	afk.removeListener(e.id);
+})
 ```
 
 ## Notes
