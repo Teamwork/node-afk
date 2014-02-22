@@ -17,43 +17,17 @@ function tick(callback) {
 		});
 	}
 	else if (/linux/.test(process.platform)) {
-		callback(0);
+		var cmd = 'xprintidle';
+		exec(cmd, function (error, stdout, stderr) {
+			if(error) {
+				callback(0);
+			}
+			callback(parseInt(stdout, 10) / 1000);
+		});
 	}
 	else {
 		callback(0);
 	}
-}
-
-// nooooope this doesn't work at all
-function getLinuxIdleTime (callback) {
-	var string = 'USER IDLE\ndonal 13.75s\ndonal 27:35\ndonal 19:43\ndonal 7.00s';
-	exec('w | awk "{if (NR!=1) {print $1,$5 }}"\'', function (error, stdout, stderr) {
-		if(error) {
-			throw stderr;
-		}
-		var times = stdout.match(/(\d{1,2}:\d\d)|(\d{1,2}.\d\ds)/g);
-
-		var shortestTime = -1;
-
-		times.forEach(function(string, i){
-			var seconds, tmpArray;
-
-			if(string.indexOf('s') !== -1) {
-				tmpArray = string.split(':');
-				seconds = parseInt(tmpArray[0], 10);
-			}
-			else {
-				tmpArray = string.split(':');
-				seconds = (parseInt(tmpArray[0], 10) * 60) + parseInt(tmpArray[1], 10);
-			}
-
-			if(shortestTime === -1 || seconds < shortestTime) {
-				shortestTime = seconds;
-			}
-		});
-
-		callback(shortestTime);
-	});
 }
 
 exports.tick = tick
