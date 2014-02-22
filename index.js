@@ -1,7 +1,12 @@
 var exec = require('child_process').exec;
 if (/^win/.test(process.platform)) var win_idle = require('./lib/idle');
 
-function tick(callback) {
+var listeners = [],
+	idle = {},
+	whenToCheck;
+
+
+idle.tick = function (callback) {
 	callback = callback || function (){};
 
 	if (/^win/.test(process.platform)) {
@@ -31,4 +36,56 @@ function tick(callback) {
 	}
 }
 
-exports.tick = tick
+idle.addListener = function (shouldSeconds, callback) {
+	var isAfk = false;
+
+	var listener = listeners.push(null);
+
+	var checkIsAway = function () {
+		idle.tick(function(isSeconds){
+			var whenSeconds = whenToCheck(isSeconds, shouldSeconds),
+				s = 1000;
+			if(whenSeconds === 0 && !isAfk) {
+				callback({
+					status: 'away',
+					seconds: isSeconds,
+					id: listener
+				});
+				isAfk = true;
+				listeners[listener] = setTimeout(checkIsAway, s);
+			}
+			else if(isAfk && whenSeconds > 0) {
+				callback({
+					status: 'back',
+					seconds: isSeconds,
+					id: listener
+				});
+				isAfk = false;
+				listeners[listener] = setTimeout(checkIsAway, whenSeconds * s);
+			}
+			else if (whenSeconds > 0 && !isAfk){
+				listeners[listener] = setTimeout(checkIsAway, whenSeconds * s);
+			}
+			else {
+				listeners[listener] = setTimeout(checkIsAway, s);
+			}
+		});
+	};
+
+	checkIsAway();
+
+	return listener;
+};
+
+idle.removeListener = function (listener) {
+	console.log(listeners[listener]);
+	clearTimeout(listeners[listener]);
+};
+
+whenToCheck = function (isSeconds, shouldSeconds) {
+	var whenSeconds = shouldSeconds - isSeconds;
+	return whenSeconds > 0 ? whenSeconds : 0;
+}
+
+
+module.exports = idle;
