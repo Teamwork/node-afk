@@ -21,8 +21,9 @@ function tick(callback) {
 		exec(cmd, function (error, stdout, stderr) {
 			if(error) {
 				callback(0);
+				return;
 			}
-			callback(parseInt(stdout, 10) / 1000);
+			callback(Math.round(parseInt(stdout, 10) / 1000));
 		});
 	}
 	else {

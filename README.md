@@ -20,4 +20,4 @@ setInterval(function(){
 ```
 
 ## Notes
-Currently just returns 0 when run on linux. Sooon..
+Linux support requires xprintidle otherwise returns 0
