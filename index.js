@@ -39,47 +39,57 @@ idle.tick = function (callback) {
 idle.addListener = function (shouldSeconds, callback) {
 	var isAfk = false;
 
-	var listener = listeners.push(null);
+	var listenerId = listeners.push(true) - 1;
+	var timeoutRef = null;
 
 	var checkIsAway = function () {
+
+		if(!listeners[listenerId]) {
+			clearTimeout(timeoutRef);
+			return;
+		}
+
 		idle.tick(function(isSeconds){
 			var whenSeconds = whenToCheck(isSeconds, shouldSeconds),
 				s = 1000;
+
 			if(whenSeconds === 0 && !isAfk) {
 				callback({
 					status: 'away',
 					seconds: isSeconds,
-					id: listener
+					id: listenerId
 				});
+
 				isAfk = true;
-				listeners[listener] = setTimeout(checkIsAway, s);
+				timeoutRef = setTimeout(checkIsAway, s);
 			}
 			else if(isAfk && whenSeconds > 0) {
 				callback({
 					status: 'back',
 					seconds: isSeconds,
-					id: listener
+					id: listenerId
 				});
+
 				isAfk = false;
-				listeners[listener] = setTimeout(checkIsAway, whenSeconds * s);
+				timeoutRef = setTimeout(checkIsAway, whenSeconds * s);
 			}
 			else if (whenSeconds > 0 && !isAfk){
-				listeners[listener] = setTimeout(checkIsAway, whenSeconds * s);
+				timeoutRef = setTimeout(checkIsAway, whenSeconds * s);
 			}
 			else {
-				listeners[listener] = setTimeout(checkIsAway, s);
+				timeoutRef = setTimeout(checkIsAway, s);
 			}
 		});
 	};
 
 	checkIsAway();
 
-	return listener;
+	return listenerId;
 };
 
-idle.removeListener = function (listener) {
-	console.log(listeners[listener]);
-	clearTimeout(listeners[listener]);
+idle.removeListener = function (listenerId) {
+	listeners[listenerId] = false;
+	return true;
 };
 
 whenToCheck = function (isSeconds, shouldSeconds) {
