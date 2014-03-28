@@ -1,4 +1,6 @@
 var exec = require('child_process').exec;
+var os = require('os');
+
 if (/^win/.test(process.platform)) {
 	if(/64/.test(os.arch())) var win_idle = require('./lib/x64/idle');
 	else var win_idle = require('./lib/x32/idle');
