@@ -1,6 +1,6 @@
 {
   "name": "afk",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,7 +15,7 @@
   "author": "Donal Linehan <me@don.al>",
   "repository": {
     "type": "git",
-    "url": "git://github.com/TeamworkPM/node-afk.git"
+    "url": "git://github.com/Teamwork/node-afk.git"
   },
   "dependencies": {},
   "devDependencies": {},
