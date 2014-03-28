@@ -1,6 +1,8 @@
 var exec = require('child_process').exec;
-if (/^win32/.test(process.platform)) var win_idle = require('./lib/idle32');
-if (/^win64/.test(process.platform)) var win_idle = require('./lib/idle64');
+if (/^win/.test(process.platform)) {
+	if(/64/.test(os.arch())) var win_idle = require('./lib/x64/idle');
+	else var win_idle = require('./lib/x32/idle');
+} 
 var listeners = [],
 	idle = {},
 	whenToCheck;
