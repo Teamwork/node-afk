@@ -2,9 +2,7 @@ var exec = require('child_process').exec;
 var os = require('os');
 
 if (/^win/.test(process.platform)) {
-	if (typeof process.versions['node-webkit']  != "undefined") var win_idle = require('./lib/nw/idle');
-	else if (/64/.test(os.arch())) var win_idle = require('./lib/x64/idle');
-	else var win_idle = require('./lib/x32/idle');
+	var win_idle = require('./lib/idle')
 } 
 var listeners = [],
 	idle = {},
@@ -15,7 +13,7 @@ idle.tick = function (callback) {
 	callback = callback || function (){};
 
 	if (/^win/.test(process.platform)) {
-		callback(Math.round(win_idle.idle() / 1000));
+		callback(Math.round(win_idle.calcIdle() / 1000));
 	}
 	else if (/darwin/.test(process.platform)) {
 		var cmd = '/usr/sbin/ioreg -c IOHIDSystem | /usr/bin/awk \'/HIDIdleTime/ {print int($NF/1000000000); exit}\'';
