@@ -10,14 +10,13 @@ idle.tick = function (callback) {
 	callback = callback || function (){};
 
 	if (/^win/.test(process.platform)) {
-		var cmd = './bin/idle.exe';
+		var cmd = 'bin\\idle.exe';
 		exec(cmd, function (error, stdout, stderr) {
 			if(error) {
 				throw stderr;
 			}
 			callback(Math.floor(parseInt(stdout, 10) / 1000))
 		});
-		callback(Math.floor(win_idle.calcIdle() / 1000));
 	}
 	else if (/darwin/.test(process.platform)) {
 		var cmd = '/usr/sbin/ioreg -c IOHIDSystem | /usr/bin/awk \'/HIDIdleTime/ {print int($NF/1000000000); exit}\'';
