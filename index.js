@@ -10,7 +10,7 @@ idle.tick = function (callback) {
 	callback = callback || function (){};
 
 	if (/^win/.test(process.platform)) {
-		var cmd = 'bin\\idle.exe';
+		var cmd = path.join( __dirname, 'bin\\idle.exe');
 		exec(cmd, function (error, stdout, stderr) {
 			if(error) {
 				throw stderr;
