@@ -1,5 +1,6 @@
 var exec = require('child_process').exec;
 var os = require('os');
+var path = require('path');
 
 var listeners = [],
 	idle = {},
