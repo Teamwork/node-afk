@@ -22,7 +22,3 @@ var listenerId = afk.addListener(seconds, function(e) {
 
 ## Notes
 Linux support requires xprintidle otherwise returns 0
-
-# Gotchas
-
-- Module won't work in node-webkit on windows unless executable is named nw.exe. See the following issue [rogerwang/node-webkit#199](https://github.com/rogerwang/node-webkit/issues/199)
