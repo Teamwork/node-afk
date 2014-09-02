@@ -1,9 +1,6 @@
 var exec = require('child_process').exec;
 var os = require('os');
 
-if (/^win/.test(process.platform)) {
-	var win_idle = require('./lib/idle')
-} 
 var listeners = [],
 	idle = {},
 	whenToCheck;
@@ -13,6 +10,13 @@ idle.tick = function (callback) {
 	callback = callback || function (){};
 
 	if (/^win/.test(process.platform)) {
+		var cmd = './bin/idle.exe';
+		exec(cmd, function (error, stdout, stderr) {
+			if(error) {
+				throw stderr;
+			}
+			callback(Math.floor(parseInt(stdout, 10) / 1000))
+		});
 		callback(Math.floor(win_idle.calcIdle() / 1000));
 	}
 	else if (/darwin/.test(process.platform)) {
