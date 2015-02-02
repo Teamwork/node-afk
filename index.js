@@ -14,28 +14,30 @@ idle.tick = function (callback) {
 		var cmd = '"' + path.join( __dirname, 'bin', 'idle.exe') + '"';
 		exec(cmd, function (error, stdout, stderr) {
 			if(error) {
-				throw stderr;
+				callback(0, error);
+				return;
 			}
-			callback(Math.floor(parseInt(stdout, 10) / 1000))
+			callback(Math.floor(parseInt(stdout, 10) / 1000), null)
 		});
 	}
 	else if (/darwin/.test(process.platform)) {
 		var cmd = '/usr/sbin/ioreg -c IOHIDSystem | /usr/bin/awk \'/HIDIdleTime/ {print int($NF/1000000000); exit}\'';
 		exec(cmd, function (error, stdout, stderr) {
 			if(error) {
-				throw stderr;
+				callback(0, error);
+				return;
 			}
-			callback(parseInt(stdout, 10));
+			callback(parseInt(stdout, 10), null);
 		});
 	}
 	else if (/linux/.test(process.platform)) {
 		var cmd = 'xprintidle';
 		exec(cmd, function (error, stdout, stderr) {
 			if(error) {
-				callback(0);
+				callback(0, error);
 				return;
 			}
-			callback(Math.round(parseInt(stdout, 10) / 1000));
+			callback(Math.round(parseInt(stdout, 10) / 1000), null);
 		});
 	}
 	else {
