@@ -1,4 +1,5 @@
 var exec = require('child_process').exec;
+var execFile = require('child_process').execFile;
 var os = require('os');
 var path = require('path');
 
@@ -11,8 +12,8 @@ idle.tick = function (callback) {
 	callback = callback || function (){};
 
 	if (/^win/.test(process.platform)) {
-		var cmd = '"' + path.join( __dirname, 'bin', 'idle.exe') + '"';
-		exec(cmd, function (error, stdout, stderr) {
+		var cmd = path.join( __dirname, 'bin', 'idle.exe');
+		execFile(cmd, function (error, stdout, stderr) {
 			if(error) {
 				callback(0, error);
 				return;
