@@ -50,14 +50,14 @@ idle.tick = function (callback) {
 idle.addListener = function (intervalSec, callback) {
 	var isAfk = false;
 
-	var listenerId = listeners.push(true) - 1;
+	var listenerIndex = listeners.push(true) - 1;
     var defaultIntervalMsec = intervalSec * 1000;
 	var timeoutId = null;
     var lastCheckDateMsec = null;
 
 	var checkIsAway = function () {
 
-		if(!listeners[listenerId]) {
+		if(!listeners[listenerIndex]) {
 			clearTimeout(timeoutId);
 			return;
 		}
@@ -68,7 +68,7 @@ idle.addListener = function (intervalSec, callback) {
 		idle.tick(function(idleSeconds, error){
 
             if(error) {
-                callback({ id: listenerId }, error);
+                callback({ id: listenerIndex }, error);
                 timeoutId = setTimeout(checkIsAway, nextIntervalDurationMsec);
                 return;
             }
@@ -80,7 +80,7 @@ idle.addListener = function (intervalSec, callback) {
                 callback({
                 	status: 'away',
                 	seconds: idleSeconds,
-                	id: listenerId
+                	id: listenerIndex
                 });
 
                 isAfk = true;
@@ -89,7 +89,7 @@ idle.addListener = function (intervalSec, callback) {
                 callback({
                     status: 'back',
                     seconds: idleSeconds,
-                    id: listenerId
+                    id: listenerIndex
                 });
 
                 isAfk = false;
@@ -101,12 +101,17 @@ idle.addListener = function (intervalSec, callback) {
 
 	checkIsAway();
 
-	return listenerId;
+	return listenerIndex;
 };
 
-idle.removeListener = function (listenerId) {
-	listeners[listenerId] = false;
-	return true;
+idle.removeListener = function (listenerIndex) {
+    if(listenerIndex < listeners.length){
+        listeners.splice(listenerIndex, 1);
+        return true;
+    }
+    else {
+        return false;
+    }
 };
 
 module.exports = idle;
