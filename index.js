@@ -4,9 +4,10 @@ var os = require('os');
 var path = require('path');
 
 var listeners = [],
-	idle = {},
-	whenToCheck;
+	idle = {};
 
+// timeout value to ask the system it's idle value
+var AFK_SYSTEM_POLLING_TIMEOUT_MSEC = 2 * 1000;
 
 idle.tick = function (callback) {
 	callback = callback || function (){};
@@ -46,49 +47,55 @@ idle.tick = function (callback) {
 	}
 }
 
-idle.addListener = function (shouldSeconds, callback) {
+idle.addListener = function (intervalSec, callback) {
 	var isAfk = false;
 
 	var listenerId = listeners.push(true) - 1;
-	var timeoutRef = null;
+    var defaultIntervalMsec = intervalSec * 1000;
+	var timeoutId = null;
+    var lastCheckDateMsec = null;
 
 	var checkIsAway = function () {
 
 		if(!listeners[listenerId]) {
-			clearTimeout(timeoutRef);
+			clearTimeout(timeoutId);
 			return;
 		}
 
-		idle.tick(function(isSeconds){
-			var whenSeconds = whenToCheck(isSeconds, shouldSeconds),
-				s = 1000;
+        intervalDurationMsec = lastCheckDateMsec ? Date.now() - lastCheckDateMsec : Number.MAX_VALUE;
+        lastCheckDateMsec = Date.now();
 
-			if(whenSeconds === 0 && !isAfk) {
-				callback({
-					status: 'away',
-					seconds: isSeconds,
-					id: listenerId
-				});
+		idle.tick(function(idleSeconds, error){
 
-				isAfk = true;
-				timeoutRef = setTimeout(checkIsAway, s);
-			}
-			else if(isAfk && whenSeconds > 0) {
-				callback({
-					status: 'back',
-					seconds: isSeconds,
-					id: listenerId
-				});
+            if(error) {
+                callback({ id: listenerId }, error);
+                timeoutId = setTimeout(checkIsAway, nextIntervalDurationMsec);
+                return;
+            }
 
-				isAfk = false;
-				timeoutRef = setTimeout(checkIsAway, whenSeconds * s);
+            // is aways if the idle duration is bigger than the interval duration
+            isAway = (idleSeconds * 1000) >= intervalDurationMsec;
+
+            if(!isAfk && isAway) {
+                callback({
+                	status: 'away',
+                	seconds: idleSeconds,
+                	id: listenerId
+                });
+
+                isAfk = true;
+            }
+            else if(isAfk && !isAway) {
+                callback({
+                    status: 'back',
+                    seconds: idleSeconds,
+                    id: listenerId
+                });
+
+                isAfk = false;
 			}
-			else if (whenSeconds > 0 && !isAfk){
-				timeoutRef = setTimeout(checkIsAway, whenSeconds * s);
-			}
-			else {
-				timeoutRef = setTimeout(checkIsAway, s);
-			}
+
+            timeoutId = setTimeout(checkIsAway, isAfk ? AFK_SYSTEM_POLLING_TIMEOUT_MSEC : defaultIntervalMsec);
 		});
 	};
 
@@ -101,11 +108,5 @@ idle.removeListener = function (listenerId) {
 	listeners[listenerId] = false;
 	return true;
 };
-
-whenToCheck = function (isSeconds, shouldSeconds) {
-	var whenSeconds = shouldSeconds - isSeconds;
-	return whenSeconds > 0 ? whenSeconds : 0;
-}
-
 
 module.exports = idle;
