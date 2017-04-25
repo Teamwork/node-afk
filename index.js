@@ -9,6 +9,9 @@ var listeners = [],
 // timeout value to ask the system it's idle value
 var AFK_SYSTEM_POLLING_TIMEOUT_MSEC = 2 * 1000;
 
+// percentage of the interval to be checked against the idle time. This avoid settings dynamic intervals.
+var INTERVAL_AWAY_IDLE_TIME_PERCENTAGE = 0.70;
+
 idle.tick = function (callback) {
 	callback = callback || function (){};
 
@@ -19,7 +22,7 @@ idle.tick = function (callback) {
 				callback(0, error);
 				return;
 			}
-			callback(Math.floor(parseInt(stdout, 10) / 1000), null)
+			callback(Math.floor(parseInt(stdout, 10) / 1000), null);
 		});
 	}
 	else if (/darwin/.test(process.platform)) {
@@ -45,7 +48,7 @@ idle.tick = function (callback) {
 	else {
 		callback(0);
 	}
-}
+};
 
 idle.addListener = function (intervalSec, callback) {
 	var isAfk = false;
@@ -62,19 +65,26 @@ idle.addListener = function (intervalSec, callback) {
 			return;
 		}
 
-        intervalDurationMsec = lastCheckDateMsec ? Date.now() - lastCheckDateMsec : Number.MAX_VALUE;
+        // calculate the duration of the interval. if there's no previous lastCheckDateMsec the duration is a very big number
+        // to have no influence on the afk status.
+        intervalDurationMsec = Number.MAX_VALUE;
+        if(lastCheckDateMsec) {
+            intervalDurationMsec = Date.now() - lastCheckDateMsec;
+        }
+
         lastCheckDateMsec = Date.now();
 
+        // ask the system what's the idle time
 		idle.tick(function(idleSeconds, error){
 
             if(error) {
                 callback({ id: listenerIndex }, error);
-                timeoutId = setTimeout(checkIsAway, nextIntervalDurationMsec);
+                timeoutId = setTimeout(checkIsAway, defaultIntervalMsec);
                 return;
             }
 
-            // is aways if the idle duration is bigger than the interval duration
-            isAway = (idleSeconds * 1000) >= intervalDurationMsec;
+            // is aways if the idle duration is bigger than a interval duration fraction
+            isAway = (idleSeconds * 1000) >= (intervalDurationMsec * INTERVAL_AWAY_IDLE_TIME_PERCENTAGE);
 
             if(!isAfk && isAway) {
                 callback({
