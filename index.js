@@ -51,19 +51,19 @@ idle.tick = function (callback) {
 };
 
 idle.addListener = function (intervalSec, callback) {
-	var isAfk = false;
+    var isAfk = false;
 
-	var listenerIndex = listeners.push(true) - 1;
+    var listenerIndex = listeners.push(true) - 1;
     var defaultIntervalMsec = intervalSec * 1000;
-	var timeoutId = null;
+    var timeoutId = null;
     var lastCheckDateMsec = null;
 
-	var checkIsAway = function () {
+    var checkIsAway = function () {
 
-		if(!listeners[listenerIndex]) {
-			clearTimeout(timeoutId);
-			return;
-		}
+        if(!listeners[listenerIndex]) {
+            clearTimeout(timeoutId);
+            return;
+        }
 
         // calculate the duration of the interval. if there's no previous lastCheckDateMsec the duration is a very big number
         // to have no influence on the afk status.
@@ -75,7 +75,7 @@ idle.addListener = function (intervalSec, callback) {
         lastCheckDateMsec = Date.now();
 
         // ask the system what's the idle time
-		idle.tick(function(idleSeconds, error){
+        idle.tick(function(idleSeconds, error){
 
             if(error) {
                 callback({ id: listenerIndex }, error);
@@ -103,15 +103,15 @@ idle.addListener = function (intervalSec, callback) {
                 });
 
                 isAfk = false;
-			}
+            }
 
             timeoutId = setTimeout(checkIsAway, isAfk ? AFK_SYSTEM_POLLING_TIMEOUT_MSEC : defaultIntervalMsec);
-		});
-	};
+        });
+    };
 
-	checkIsAway();
+    checkIsAway();
 
-	return listenerIndex;
+    return listenerIndex;
 };
 
 idle.removeListener = function (listenerIndex) {
