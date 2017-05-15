@@ -3,9 +3,7 @@ var systemIdleTime = require('@paulcbetts/system-idle-time');
 var listeners = [],
     addListener,
     tick,
-    removeListener,
-    onError,
-    errorHandler;
+    removeListener;
 
 
 // timeout value to ask the system it's idle value
@@ -15,7 +13,7 @@ var AFK_SYSTEM_POLLING_TIMEOUT_MSEC = 2 * 1000;
 var INTERVAL_AWAY_IDLE_TIME_PERCENTAGE = 0.70;
 
 tick = function () {
-    return Math.round(systemIdleTime.getIdleTime() / 1000);
+    return Math.floor(systemIdleTime.getIdleTime() / 1000);
 };
 
 addListener = function (intervalSec, callback) {
@@ -27,7 +25,8 @@ addListener = function (intervalSec, callback) {
     var lastCheckDateMsec = null;
 
     var checkIsAway = function () {
-        var idleSeconds;
+        var idleSeconds,
+            error;
 
         if(!listeners[listenerIndex]) {
             clearTimeout(timeoutId);
@@ -47,10 +46,10 @@ addListener = function (intervalSec, callback) {
         try {
             idleSeconds = tick();
         } catch (err) {
-            if (typeof errorHandler !== 'undefined') errorHandler(err);
-            idleSeconds = 0;
+            callback({id: listenerIndex}, err)
+            timeoutId = setTimeout(checkIsAway, defaultIntervalMsec);
+            return
         }
-
 
         // is aways if the idle duration is bigger than a interval duration fraction
         isAway = (idleSeconds * 1000) >= (intervalDurationMsec * INTERVAL_AWAY_IDLE_TIME_PERCENTAGE);
@@ -91,14 +90,8 @@ removeListener = function (listenerIndex) {
         return false;
     }
 };
-
-onError = function (callback) {
-    errorHandler = callback;
-}
-
 module.exports = {
     removeListener: removeListener,
     addListener: addListener,
-    tick: tick,
-    onError: onError
+    tick: tick
 };
