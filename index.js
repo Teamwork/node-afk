@@ -1,7 +1,12 @@
 var systemIdleTime = require('@paulcbetts/system-idle-time');
 
 var listeners = [],
-    idle = {};
+    addListener,
+    tick,
+    removeListener,
+    onError,
+    errorHandler;
+
 
 // timeout value to ask the system it's idle value
 var AFK_SYSTEM_POLLING_TIMEOUT_MSEC = 2 * 1000;
@@ -9,11 +14,11 @@ var AFK_SYSTEM_POLLING_TIMEOUT_MSEC = 2 * 1000;
 // percentage of the interval to be checked against the idle time. This avoid settings dynamic intervals.
 var INTERVAL_AWAY_IDLE_TIME_PERCENTAGE = 0.70;
 
-idle.tick = function () {
-    return systemIdleTime.getIdleTime() / 1000
+tick = function () {
+    return Math.round(systemIdleTime.getIdleTime() / 1000);
 };
 
-idle.addListener = function (intervalSec, callback) {
+addListener = function (intervalSec, callback) {
     var isAfk = false;
 
     var listenerIndex = listeners.push(true) - 1;
@@ -39,7 +44,13 @@ idle.addListener = function (intervalSec, callback) {
         lastCheckDateMsec = Date.now();
 
         // ask the system what's the idle time
-        idleSeconds = idle.tick()
+        try {
+            idleSeconds = tick();
+        } catch (err) {
+            if (typeof errorHandler !== 'undefined') errorHandler(err);
+            idleSeconds = 0;
+        }
+
 
         // is aways if the idle duration is bigger than a interval duration fraction
         isAway = (idleSeconds * 1000) >= (intervalDurationMsec * INTERVAL_AWAY_IDLE_TIME_PERCENTAGE);
@@ -71,7 +82,7 @@ idle.addListener = function (intervalSec, callback) {
     return listenerIndex;
 };
 
-idle.removeListener = function (listenerIndex) {
+removeListener = function (listenerIndex) {
     if(listenerIndex < listeners.length){
         listeners.splice(listenerIndex, 1);
         return true;
@@ -81,4 +92,13 @@ idle.removeListener = function (listenerIndex) {
     }
 };
 
-module.exports = idle;
+onError = function (callback) {
+    errorHandler = callback;
+}
+
+module.exports = {
+    removeListener: removeListener,
+    addListener: addListener,
+    tick: tick,
+    onError: onError
+};

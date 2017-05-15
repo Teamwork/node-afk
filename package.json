@@ -18,7 +18,7 @@
     "url": "git://github.com/Teamwork/node-afk.git"
   },
   "dependencies": {
-    "@paulcbetts/system-idle-time": "^1.0.4"
+    "@paulcbetts/system-idle-time": "1.0.4"
   },
   "devDependencies": {},
   "main": "index.js",
