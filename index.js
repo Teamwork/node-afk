@@ -17,16 +17,16 @@ tick = function () {
 };
 
 addListener = function (intervalSec, callback) {
-    var isAfk = false;
-
-    var listenerIndex = listeners.push(true) - 1;
-    var defaultIntervalMsec = intervalSec * 1000;
-    var timeoutId = null;
-    var lastCheckDateMsec = null;
+    var isAfk = false,
+        listenerIndex = listeners.push(true) - 1,
+        defaultIntervalMsec = intervalSec * 1000,
+        timeoutId = null,
+        lastCheckDateMsec = null;
 
     var checkIsAway = function () {
         var idleSeconds,
-            error;
+            intervalDurationMsec,
+            isAway;
 
         if(!listeners[listenerIndex]) {
             clearTimeout(timeoutId);
@@ -46,9 +46,9 @@ addListener = function (intervalSec, callback) {
         try {
             idleSeconds = tick();
         } catch (err) {
-            callback({id: listenerIndex}, err)
+            callback({id: listenerIndex}, err);
             timeoutId = setTimeout(checkIsAway, defaultIntervalMsec);
-            return
+            return;
         }
 
         // is aways if the idle duration is bigger than a interval duration fraction
