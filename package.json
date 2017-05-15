@@ -5,6 +5,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "description": "Provides seconds since the user was last active",
+  "files": [
+    "index.js"
+  ],
   "keywords": [
     "user idle",
     "afk",
