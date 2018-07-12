@@ -1,6 +1,6 @@
 {
   "name": "afk",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,7 +17,9 @@
     "type": "git",
     "url": "git://github.com/Teamwork/node-afk.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "desktop-idle": "1.1.1"
+  },
   "devDependencies": {},
   "main": "index.js"
 }

@@ -1,5 +1,4 @@
 *.iml
 .idea
-
-test.js
-src/build
+package-lock.json
+node_modules
