@@ -1,0 +1,11 @@
+sudo: required
+language: node_js
+dist: trusty
+group: deprecated-2017Q4
+before_install:
+- npm set "//registry.npmjs.org/:_authToken=$NPM_REGISTRY_KEY"
+install:
+- npm install
+script:
+- npm runt lint
+- npm test
