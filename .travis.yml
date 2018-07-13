@@ -1,11 +1,12 @@
 sudo: required
+group: edge
 language: node_js
-dist: trusty
-group: deprecated-2017Q4
+
 before_install:
-- npm set "//registry.npmjs.org/:_authToken=$NPM_REGISTRY_KEY"
+  - sudo apt-get update
+  - sudo apt-get install -y libxss-dev pkg-config
 install:
 - npm install
 script:
-- npm runt lint
+- npm run lint
 - npm test
