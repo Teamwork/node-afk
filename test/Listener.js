@@ -91,9 +91,8 @@ describe('Listener', () => {
       expect(callback.firstCall.args[1].message).to.equal('test');
     });
 
-    it('should schedule the check for a quater of the away time if the user is active', () => {
-      const secondsTilAway = 40;
-      const expectedMiliSecondsForSchedule = (secondsTilAway / 4) * 1000;
+    it('should schedule the check every 1 second', () => {
+      const secondsTilAway = 2;
       const listener = new Listener(1, secondsTilAway);
       const clock = sinon.useFakeTimers();
 
@@ -104,26 +103,8 @@ describe('Listener', () => {
       expect(listener.checkIsAway.callCount).to.equal(0);
       expect(listener.timeoutId).to.not.be.null;
 
-      clock.tick(expectedMiliSecondsForSchedule + 1000);
-      clock.restore();
-
-      expect(listener.checkIsAway.callCount).to.equal(1);
-    });
-
-    it('should schedule the check for set time if the user is not active', () => {
-      const defaultAwayCheckTime = 2000;
-      const listener = new Listener(1, 40);
-      listener.isAway = true;
-      const clock = sinon.useFakeTimers();
-
-      global.sandbox.stub(listener, 'checkIsAway').returns();
-
-      listener.scheduleCheckIsAway();
-
-      expect(listener.checkIsAway.callCount).to.equal(0);
-      expect(listener.timeoutId).to.not.be.null;
-
-      clock.tick(defaultAwayCheckTime + 1000);
+      // Check is scheduled every 1 second
+      clock.tick(1500);
       clock.restore();
 
       expect(listener.checkIsAway.callCount).to.equal(1);
@@ -132,8 +113,7 @@ describe('Listener', () => {
 
   describe('removeListener', () => {
     it('should stop afk checks', () => {
-      const secondsTilAway = 40;
-      const timeToCheckForCall = (secondsTilAway / 4) * 1000;
+      const secondsTilAway = 2;
       const clock = sinon.useFakeTimers();
 
       const listener = new Listener(1, secondsTilAway);
@@ -148,7 +128,7 @@ describe('Listener', () => {
       expect(listener.shouldListen).to.be.false;
       expect(listener.timeoutId).to.be.null;
 
-      clock.tick(timeToCheckForCall * 4);
+      clock.tick(2000);
       clock.restore();
 
       expect(listener.checkIsAway.callCount).to.equal(0);

@@ -1,6 +1,8 @@
 const desktopIdle = require('desktop-idle');
 
-const AFK_SYSTEM_POLLING_TIMEOUT = 2 * 1000;
+// We want the status of the user to be accurate.
+// To ensure this we need to frequently check the users status
+const DEFAULT_POLLING_TIMEOUT = 1000;
 
 class Listener {
   constructor(id, timeToAway, callback) {
@@ -23,7 +25,7 @@ class Listener {
       return;
     }
 
-    const isAway = idleSeconds > this.timeToAway;
+    const isAway = idleSeconds >= this.timeToAway;
 
     if (!this.isAway && isAway) {
       this.callback({
@@ -48,9 +50,7 @@ class Listener {
 
   scheduleCheckIsAway() {
     if (!this.shouldListen) return;
-    const userCalculatedTime = parseInt((this.timeToAway / 4) * 1000, 10);
-    const delay = this.isAway ? AFK_SYSTEM_POLLING_TIMEOUT : userCalculatedTime;
-    this.timeoutId = setTimeout(() => { this.checkIsAway(); }, delay);
+    this.timeoutId = setTimeout(() => { this.checkIsAway(); }, DEFAULT_POLLING_TIMEOUT);
   }
 
   removeListener() {
