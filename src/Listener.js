@@ -2,18 +2,27 @@ const desktopIdle = require('desktop-idle');
 
 // We want the status of the user to be accurate.
 // To ensure this we need to frequently check the users status
-const DEFAULT_POLLING_TIMEOUT = 1000;
+const POLLING_INTERVAL = 1000;
 
 class Listener {
-  constructor(id, timeToAway, callback) {
+  // id - {Number} id to assign to the listener
+  // timeUntilAway - {Number} - Seconds of no activity until a user should be classed as 'away'
+  // callback - {Function} - Function to call with user status updates
+  constructor(id, timeUntilAway, callback) {
     this.id = id;
-    this.timeToAway = timeToAway;
-    this.timeoutId = null;
+    this.timeUntilAway = timeUntilAway;
     this.callback = callback;
     this.isAway = false;
-    this.shouldListen = true;
+    this.intervalId = setInterval(() => this.checkIsAway(), POLLING_INTERVAL);
   }
 
+  // Checks if the user is away or active
+  // Calls the callback with an {Object} containing the following properties
+  //  :status - {String} - 'away' if the user is now away, 'back' if the user was away
+  //    and is now active
+  //  :seconds - {Number} - The seconds that have passed without any interaction from the user
+  //  :id - {Number} - The id of the listener
+  // The callback will only be called if the users status has changed since the last check.
   checkIsAway() {
     let idleSeconds;
 
@@ -21,13 +30,13 @@ class Listener {
       idleSeconds = desktopIdle.getIdleTime();
     } catch (error) {
       this.callback(null, error);
-      this.scheduleCheckIsAway();
       return;
     }
 
-    const isAway = idleSeconds >= this.timeToAway;
+    const wasAway = this.isAway;
+    const isAway = idleSeconds >= this.timeUntilAway;
 
-    if (!this.isAway && isAway) {
+    if (!wasAway && isAway) {
       this.callback({
         status: 'away',
         seconds: idleSeconds,
@@ -35,7 +44,7 @@ class Listener {
       });
 
       this.isAway = isAway;
-    } else if (this.isAway && !isAway) {
+    } else if (wasAway && !isAway) {
       this.callback({
         status: 'back',
         seconds: idleSeconds,
@@ -44,19 +53,11 @@ class Listener {
 
       this.isAway = isAway;
     }
-
-    this.scheduleCheckIsAway();
   }
 
-  scheduleCheckIsAway() {
-    if (!this.shouldListen) return;
-    this.timeoutId = setTimeout(() => { this.checkIsAway(); }, DEFAULT_POLLING_TIMEOUT);
-  }
-
-  removeListener() {
-    this.shouldListen = false;
-    clearTimeout(this.timeoutId);
-    this.timeoutId = null;
+  stop() {
+    clearInterval(this.intervalId);
+    this.intervalId = null;
   }
 }
 
