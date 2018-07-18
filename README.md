@@ -20,9 +20,9 @@ On linux you will need to install `libxss-dev` and `pkg-config` to build this mo
 ```js
 const afk = require('afk');
 
-const timeUntilAway = 10; // 10 seconds
+const secondsUntilAway = 10; // 10 seconds
 
-const listenerId = afk.addListener(timeUntilAway, (result , error) {
+const listenerId = afk.addListener(secondsUntilAway, (error, result) {
     if (error) {
         console.error(error);
     } else {
@@ -54,11 +54,11 @@ console.log(listeners);
 */
 ```
 
-### AFK.addListener(timeUntilAway, callback)
+### AFK.addListener(secondsUntilAway, callback)
 
-- `timeUntilAway` - Seconds without activity to classify a user as away
+- `secondsUntilAway` - Seconds without activity to classify a user as away
 
-- `callback(data, error)` - Function that will be called when the user status changed.
+- `callback(error, data)` - Function that will be called when the user status changed.
 
     - `data` will be an `object` that contains the properties:
 
@@ -71,7 +71,7 @@ This function returns the ID of the listener that was created.
 ```js
 const afk = require('afk');
 
-const listenerId = afk.addListener(10, (result , error) => {
+const listenerId = afk.addListener(10, (error, result) => {
     if (error) {
         console.error(error);
     } else {

@@ -47,7 +47,8 @@ describe('Listener', () => {
 
       expect(listener.isAway).to.be.true;
       expect(callback.callCount).to.equal(1);
-      expect(callback.firstCall.args[0]).to.deep.equal({
+      expect(callback.firstCall.args[0]).to.be.null;
+      expect(callback.firstCall.args[1]).to.deep.equal({
         id: 1,
         seconds: 10,
         status: 'away',
@@ -66,7 +67,8 @@ describe('Listener', () => {
 
       expect(listener.isAway).to.be.false;
       expect(callback.callCount).to.equal(1);
-      expect(callback.firstCall.args[0]).to.deep.equal({
+      expect(callback.firstCall.args[0]).to.be.null;
+      expect(callback.firstCall.args[1]).to.deep.equal({
         id: 1,
         seconds: 5,
         status: 'back',
@@ -97,9 +99,9 @@ describe('Listener', () => {
       listener.checkIsAway();
 
       expect(callback.callCount).to.equal(1);
-      expect(callback.firstCall.args[0]).to.be.null;
-      expect(callback.firstCall.args[1] instanceof Error).to.be.true;
-      expect(callback.firstCall.args[1].message).to.equal('test');
+      expect(callback.firstCall.args[0] instanceof Error).to.be.true;
+      expect(callback.firstCall.args[0].message).to.equal('test');
+      expect(callback.firstCall.args[1]).to.be.null;
     });
   });
 

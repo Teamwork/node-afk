@@ -6,11 +6,11 @@ const POLLING_INTERVAL = 1000;
 
 class Listener {
   // id - {Number} id to assign to the listener
-  // timeUntilAway - {Number} - Seconds of no activity until a user should be classed as 'away'
+  // secondsUntilAway - {Number} - Seconds of no activity until a user should be classed as 'away'
   // callback - {Function} - Function to call with user status updates
-  constructor(id, timeUntilAway, callback) {
+  constructor(id, secondsUntilAway, callback) {
     this.id = id;
-    this.timeUntilAway = timeUntilAway;
+    this.secondsUntilAway = secondsUntilAway;
     this.callback = callback;
     this.isAway = false;
     this.intervalId = setInterval(() => this.checkIsAway(), POLLING_INTERVAL);
@@ -29,15 +29,15 @@ class Listener {
     try {
       idleSeconds = desktopIdle.getIdleTime();
     } catch (error) {
-      this.callback(null, error);
+      this.callback(error, null);
       return;
     }
 
     const wasAway = this.isAway;
-    const isAway = idleSeconds >= this.timeUntilAway;
+    const isAway = idleSeconds >= this.secondsUntilAway;
 
     if (!wasAway && isAway) {
-      this.callback({
+      this.callback(null, {
         status: 'away',
         seconds: idleSeconds,
         id: this.id,
@@ -45,7 +45,7 @@ class Listener {
 
       this.isAway = isAway;
     } else if (wasAway && !isAway) {
-      this.callback({
+      this.callback(null, {
         status: 'back',
         seconds: idleSeconds,
         id: this.id,
