@@ -21,13 +21,9 @@ class NodeAFK {
     const afkListener = new Listener(listenerId, interval, callback);
     afkListener.checkIsAway();
 
-    this.addListenerToList(listenerId, afkListener);
+    this.listeners[listenerId] = afkListener;
 
     return listenerId;
-  }
-
-  addListenerToList(id, listener) {
-    this.listeners[id] = listener;
   }
 
   // Remove a listener
@@ -35,7 +31,7 @@ class NodeAFK {
   // Returns a Boolean of the success of the operation
   removeListener(id) {
     if (this.listeners[id]) {
-      this.listeners[id].removeListener();
+      this.listeners[id].stop();
       delete this.listeners[id];
       return true;
     }
@@ -45,7 +41,7 @@ class NodeAFK {
 
   removeAllListeners() {
     Object.values(this.listeners).forEach((listener) => {
-      listener.removeListener();
+      listener.stop();
     });
 
     this.listeners = {};

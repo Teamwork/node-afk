@@ -20,14 +20,6 @@ describe('NodeAFK', () => {
     });
   });
 
-  describe('addListenerToList', () => {
-    it('should add a listener to the Object', () => {
-      const id = 1;
-      NodeAFK.addListenerToList(id, new Listener());
-      expect(Object.keys(NodeAFK.getAllListeners()).length).to.equal(1);
-    });
-  });
-
   describe('addListener', () => {
     it('should create a new AFK listener', () => {
       global.sandbox.stub(Listener.prototype, 'checkIsAway').returns();
@@ -50,10 +42,10 @@ describe('NodeAFK', () => {
   describe('removeListener', () => {
     it('should remove a listener by its id', () => {
       const newListener = new Listener();
-      global.sandbox.stub(newListener, 'removeListener').returns();
+      global.sandbox.spy(newListener, 'stop');
       const listenerId = 1;
 
-      NodeAFK.addListenerToList(listenerId, newListener);
+      NodeAFK.listeners[listenerId] = newListener;
 
       expect(Object.keys(NodeAFK.getAllListeners()).length).to.equal(1);
       const listener = NodeAFK.getAllListeners()[listenerId];
@@ -61,7 +53,7 @@ describe('NodeAFK', () => {
 
       expect(result).to.be.true;
       expect(Object.keys(NodeAFK.getAllListeners()).length).to.equal(0);
-      expect(listener.removeListener.callCount).to.equal(1);
+      expect(listener.stop.callCount).to.equal(1);
     });
 
     it('should return false if a listener could not be removed', () => {
@@ -75,11 +67,11 @@ describe('NodeAFK', () => {
       const firstListener = new Listener();
       const secondListener = new Listener();
 
-      global.sandbox.stub(firstListener, 'removeListener').returns();
-      global.sandbox.stub(secondListener, 'removeListener').returns();
+      global.sandbox.spy(firstListener, 'stop');
+      global.sandbox.spy(secondListener, 'stop');
 
-      NodeAFK.addListenerToList(1, firstListener);
-      NodeAFK.addListenerToList(2, secondListener);
+      NodeAFK.listeners[1] = firstListener;
+      NodeAFK.listeners[2] = secondListener;
 
       const listeners = NodeAFK.getAllListeners();
 
@@ -88,7 +80,7 @@ describe('NodeAFK', () => {
       NodeAFK.removeAllListeners();
 
       Object.values(listeners).forEach((listener) => {
-        expect(listener.removeListener.callCount).to.equal(1);
+        expect(listener.stop.callCount).to.equal(1);
       });
 
       expect(Object.keys(NodeAFK.getAllListeners()).length).to.equal(0);

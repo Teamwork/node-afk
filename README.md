@@ -1,8 +1,8 @@
 # node-afk
 
-A simple module to get how long the user has been away for with **100% test coverage**. Also provides `away` and `back` status updates. Scroll down for API and Usage Example.
+A simple module to get how many seconds the user has been away for with **100% test coverage**. Also provides `away` and `back` status updates. Scroll down for API and Usage Example.
 
-### Note: Node AFK 1.0.0 requires Node 8 + due to ES6 usage. Use 0.5.0 for Node < 8 ( 0.5.0 no longer supported)
+### Note: Node AFK 1.0.0 requires Node >= 8 due to ES6 usage. Use 0.5.0 for Node < 8 ( 0.5.0 no longer supported)
 ---
 
 ## Install
@@ -10,9 +10,9 @@ A simple module to get how long the user has been away for with **100% test cove
 npm install afk
 ```
 
-This package contains Native Modules that need to be build using Node GYP;
+This package contains native modules that need to be built using node-gyp.
 
-On Linux, you need `libxss-dev` and `pkg-config`
+On linux you will need to install `libxss-dev` and `pkg-config` to build this module.
 
 ---
 
@@ -20,7 +20,7 @@ On Linux, you need `libxss-dev` and `pkg-config`
 ```js
 const afk = require('afk');
 
-const timeUntilAway = 10;
+const timeUntilAway = 10; // 10 seconds
 
 const listenerId = afk.addListener(timeUntilAway, (result , error) {
     if (error) {
@@ -40,9 +40,10 @@ const listenerId = afk.addListener(timeUntilAway, (result , error) {
 
 Returns an Object containing all registered AFK listeners.
 
-Example
 ```js
-const listeners = AFK.getAllListeners();
+const afk = require('afk');
+
+const listeners = afk.getAllListeners();
 
 console.log(listeners);
 /* Output
@@ -53,20 +54,24 @@ console.log(listeners);
 */
 ```
 
-
-
 ### AFK.addListener(timeUntilAway, callback)
 
-`timeUntilAway` - Seconds without activity to classify a user as away
-`callback(data, error)` - Function that will be called when the user status changed.
+- `timeUntilAway` - Seconds without activity to classify a user as away
 
-`data` contains the id of the listener, the status and the time since last activity in seconds.
+- `callback(data, error)` - Function that will be called when the user status changed.
+
+    - `data` will be an `object` that contains the properties:
+
+        - `id` - The ID of the listener
+        - `status` - The users status (`online`, `offline`, `away`)
+        - `time` - The number of seconds since the user was last active
 
 This function returns the ID of the listener that was created.
 
-Example
 ```js
-const listenerId = afk.addListener(timeUntilAway, (result , error) {
+const afk = require('afk');
+
+const listenerId = afk.addListener(10, (result , error) => {
     if (error) {
         console.error(error);
     } else {
@@ -77,28 +82,30 @@ const listenerId = afk.addListener(timeUntilAway, (result , error) {
 ```
 
 ### AFK.removeListener(listenerId)
+
 Unregisters and removes a registered listener given its ID.
 
 Returns a boolean specifying if the listener was successfully removed.
 
-Example
 ```js
-const listenerId = afk.addListener(....);
+const afk = require('afk');
+
+const listenerId = afk.addListener(...);
 
 ...
 
-afk.removeListener(listenerId)
+afk.removeListener(listenerId);
 ```
 
 ### AFK.removeAllListeners()
+
 Unregisters and removes all registered listeners.
 
-Example
-```
-const listenerOne = afk.addListener(....);
-const listenerTwo = afk.addListener(....);
+```js
+const listenerOne = afk.addListener(...);
+const listenerTwo = afk.addListener(...);
 
-....
+...
 
 afk.removeAllListeners();
 ```
@@ -106,6 +113,7 @@ afk.removeAllListeners();
 ---
 
 # Contributing
+
 Contributions are always welcome. Make sure you write tests for anything you add or change. We also enforce AirBNB ESLint rules.
 
 ---
