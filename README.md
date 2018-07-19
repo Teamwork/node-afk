@@ -22,7 +22,7 @@ const afk = require('afk');
 
 const secondsUntilAway = 10; // 10 seconds
 
-const listenerId = afk.addListener(secondsUntilAway, (error, result) {
+const watcherId = afk.addWatcher(secondsUntilAway, (error, result) {
     if (error) {
         console.error(error);
     } else {
@@ -36,25 +36,25 @@ const listenerId = afk.addListener(secondsUntilAway, (error, result) {
 
 ## Public API
 
-### AFK.getAllListeners()
+### AFK.getAllWatchers()
 
-Returns an Object containing all registered AFK listeners.
+Returns an Object containing all registered afk status watchers.
 
 ```js
 const afk = require('afk');
 
-const listeners = afk.getAllListeners();
+const watchers = afk.getAllWatchers();
 
-console.log(listeners);
+console.log(watchers);
 /* Output
 {
-    1: Listener,
-    2: Listener,
+    1: StatusWatcher,
+    2: StatusWatcher,
 }
 */
 ```
 
-### AFK.addListener(secondsUntilAway, callback)
+### AFK.addWatcher(secondsUntilAway, callback)
 
 - `secondsUntilAway` - Seconds without activity to classify a user as away
 
@@ -62,16 +62,16 @@ console.log(listeners);
 
     - `data` will be an `object` that contains the properties:
 
-        - `id` - The ID of the listener
+        - `id` - The ID of the watcher
         - `status` - The users status (`online`, `offline`, `away`)
         - `time` - The number of seconds since the user was last active
 
-This function returns the ID of the listener that was created.
+This function returns the ID of the watcher that was created.
 
 ```js
 const afk = require('afk');
 
-const listenerId = afk.addListener(10, (error, result) => {
+const watcherId = afk.addWatcher(10, (error, result) => {
     if (error) {
         console.error(error);
     } else {
@@ -81,33 +81,33 @@ const listenerId = afk.addListener(10, (error, result) => {
 });
 ```
 
-### AFK.removeListener(listenerId)
+### AFK.removeWatcher(watcherId)
 
-Unregisters and removes a registered listener given its ID.
+Unregisters and removes a registered watcher given its ID.
 
-Returns a boolean specifying if the listener was successfully removed.
+Returns a boolean specifying if the watcher was successfully removed.
 
 ```js
 const afk = require('afk');
 
-const listenerId = afk.addListener(...);
+const watcherId = afk.addWatcher(...);
 
 ...
 
-afk.removeListener(listenerId);
+afk.removeWatcher(watcherId);
 ```
 
-### AFK.removeAllListeners()
+### AFK.removeAllWatchers()
 
-Unregisters and removes all registered listeners.
+Unregisters and removes all registered watchers.
 
 ```js
-const listenerOne = afk.addListener(...);
-const listenerTwo = afk.addListener(...);
+const watcherOne = afk.addWatcher(...);
+const watcherTwo = afk.addWatcher(...);
 
 ...
 
-afk.removeAllListeners();
+afk.removeAllWatchers();
 ```
 
 ---

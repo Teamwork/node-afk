@@ -4,16 +4,20 @@ const desktopIdle = require('desktop-idle');
 // To ensure this we need to frequently check the users status
 const POLLING_INTERVAL = 1000;
 
-class Listener {
+class StatusWatcher {
   // id - {Number} id to assign to the listener
   // secondsUntilAway - {Number} - Seconds of no activity until a user should be classed as 'away'
   // callback - {Function} - Function to call with user status updates
   constructor(id, secondsUntilAway, callback) {
     this.id = id;
     this.secondsUntilAway = secondsUntilAway;
+    this.intervalId = null;
     this.callback = callback;
     this.isAway = false;
-    this.intervalId = setInterval(() => this.checkIsAway(), POLLING_INTERVAL);
+  }
+
+  start() {
+    this.intervalId = setInterval(() => this.checkStatus(), POLLING_INTERVAL);
   }
 
   // Checks if the user is away or active
@@ -23,7 +27,7 @@ class Listener {
   //  :seconds - {Number} - The seconds that have passed without any interaction from the user
   //  :id - {Number} - The id of the listener
   // The callback will only be called if the users status has changed since the last check.
-  checkIsAway() {
+  checkStatus() {
     let idleSeconds;
 
     try {
@@ -61,4 +65,4 @@ class Listener {
   }
 }
 
-module.exports = Listener;
+module.exports = StatusWatcher;

@@ -1,50 +1,50 @@
-const Listener = require('./Listener');
+const StatusWatcher = require('./StatusWatcher');
 
 class NodeAFK {
   constructor() {
-    this.listeners = {};
-    this.nextListenerId = 1;
+    this.watchers = {};
+    this.nextWatcherId = 1;
   }
 
-  getAllListeners() {
-    return this.listeners;
+  getAllWatchers() {
+    return this.watchers;
   }
 
-  // Add a listener to report on the user's activity status
+  // Add a watcher to report on the user's activity status
   // inverval - {Number} of Seconds
   // callback - {Function}
-  // Returns a {Number} - The id of the listener that was created
-  addListener(interval, callback) {
-    const listenerId = this.nextListenerId;
-    this.nextListenerId += 1;
+  // Returns a {Number} - The id of the watcher that was created
+  addWatcher(interval, callback) {
+    const watcherId = this.nextWatcherId;
+    this.nextwatcherId += 1;
 
-    const afkListener = new Listener(listenerId, interval, callback);
-    afkListener.checkIsAway();
+    const statusWatcher = new StatusWatcher(watcherId, interval, callback);
+    statusWatcher.start();
 
-    this.listeners[listenerId] = afkListener;
+    this.watchers[watcherId] = statusWatcher;
 
-    return listenerId;
+    return watcherId;
   }
 
-  // Remove a listener
-  // id - {Number} id of the listener
+  // Remove a watcher
+  // id - {Number} id of the watcher
   // Returns a {Boolean} to indicate the status of the operation
-  removeListener(id) {
-    if (this.listeners[id]) {
-      this.listeners[id].stop();
-      delete this.listeners[id];
+  removeWatcher(id) {
+    if (this.watchers[id]) {
+      this.watchers[id].stop();
+      delete this.watchers[id];
       return true;
     }
 
     return false;
   }
 
-  removeAllListeners() {
-    Object.values(this.listeners).forEach((listener) => {
-      listener.stop();
+  removeAllWatchers() {
+    Object.values(this.watchers).forEach((watcher) => {
+      watcher.stop();
     });
 
-    this.listeners = {};
+    this.watchers = {};
   }
 }
 
