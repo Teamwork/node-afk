@@ -1,122 +1,112 @@
 # node-afk
 
-A simple module to get how many seconds the user has been away for with **100% test coverage**. Also provides `away` and `back` status updates. Scroll down for API and Usage Example.
+Trigger an action when the presence status of the user changes.
 
-### Note: Node AFK 1.0.0 requires Node >= 8 due to ES6 usage. Use 0.5.0 for Node < 8 ( 0.5.0 no longer supported)
----
+## Prerequisites
 
-## Install
-```
+- Node.js >= 8.0.0
+
+## Installation
+
+```sh
 npm install afk
 ```
 
-This package contains native modules that need to be built using node-gyp.
+This module uses a native module that needs to be built using `node-gyp`.
 
-On linux you will need to install `libxss-dev` and `pkg-config` to build this module.
+On linux you will need to install `libxss-dev` and `pkg-config` to ensure that the native module dependency can be built.
 
----
+## Usage
 
-## General Usage Example
 ```js
-const afk = require('afk');
+const NodeAFK = require('node-afk');
 
-const secondsUntilAway = 10; // 10 seconds
+const inactivityDuration = 1000 * 10; // the user will be considered `offline` after 10 seconds
 
-const watcherId = afk.addWatcher(secondsUntilAway, (error, result) {
-    if (error) {
-        console.error(error);
-    } else {
-        console.log(`User Status: ${result.status}`);
-        console.log(`Time since last activity: ${result.time}`);
-    }
+const afk = new NodeAFK(inactivityDuration);
+
+afk.init();
+
+afk.on('away', () => {
+  // the status of the user changed from `online` to `away`
+});
+
+afk.on('online', () => {
+  // the status of the user changed from `away` to `online`
+})
+```
+
+`node-afk` is an event emitter and emits the following events:
+
+- `away` - the status of the user changed from `online` to `away`
+- `online` - the status of the user changed from `away` to `online`
+- `status-changed` - the status of the user changed. An object is passed to the listener for this event containing details of the previous and current status.
+
+```js
+afk.on('status-changed', (err, { previousStatus, currentStatus }) => {
+  // `previousStatus` is the status of the user before it changed
+  // `currentStatus` is the status of the user after it changed
+})
+```
+
+You can unregister a listener from an event using the `off` method of the event emitter:
+
+```js
+afk.off('away', awayListener);
+```
+
+You can also setup a listener that is executed when the status of the user has been their current status for a certain duration:
+
+```js
+afk.on('away:5000', () => {
+  // the user has been `away` for 5 seconds
+});
+
+afk.on('online:15000', () => {
+  // the user has been `online` for 15 seconds
 });
 ```
 
----
+These events will be emitted each time the status of the user is changed.
 
-## Public API
+## API
 
-### AFK.getAllWatchers()
+### constructor(inactivityDuration, [pollInterval], [initialStatus])
 
-Returns an Object containing all registered afk status watchers.
+Create a new instance of `node-afk`
 
-```js
-const afk = require('afk');
+- `inactivityDuration` - How long (in `ms`) until the user can be inactive until they are considered as `away`
+- `pollInterval` - How often (in `ms`) should `node-afk`  query the system to get the the amount of time that the user has been away for (`1000ms` by default)
+- `initialStatus` - The initial status of the user (`away` or `online`, `online` by default)
 
-const watchers = afk.getAllWatchers();
+### on(eventName, listener)
 
-console.log(watchers);
-/* Output
-{
-    1: StatusWatcher,
-    2: StatusWatcher,
-}
-*/
-```
+Register a listener on an event
 
-### AFK.addWatcher(secondsUntilAway, callback)
+- `eventName` - `away`, `online`, `status-changed`, `<status>:<time>`
+- `listener` - Function to be executed when the event is emitted
 
-- `secondsUntilAway` - Seconds without activity to classify a user as away
+### off(eventName, listener)
 
-- `callback(error, data)` - Function that will be called when the user status changed.
+Unregister a listener from an event
 
-    - `data` will be an `object` that contains the properties:
+- `eventName` - The name of the event
+- `listener` - The listener associated with the event
 
-        - `id` - The ID of the watcher
-        - `status` - The users status (`online`, `offline`, `away`)
-        - `time` - The number of seconds since the user was last active
+### init()
 
-This function returns the ID of the watcher that was created.
+Initalise the `node-afk` instance. 
 
-```js
-const afk = require('afk');
+**This is required to be called so that the poll interval is setup.**
 
-const watcherId = afk.addWatcher(10, (error, result) => {
-    if (error) {
-        console.error(error);
-    } else {
-        console.log(`User Status: ${result.status}`);
-        console.log(`Time since last activity: ${result.time}`);
-    }
-});
-```
+### destroy()
 
-### AFK.removeWatcher(watcherId)
+Stops the poll interval and removes all event listeners.
 
-Unregisters and removes a registered watcher given its ID.
-
-Returns a boolean specifying if the watcher was successfully removed.
-
-```js
-const afk = require('afk');
-
-const watcherId = afk.addWatcher(...);
-
-...
-
-afk.removeWatcher(watcherId);
-```
-
-### AFK.removeAllWatchers()
-
-Unregisters and removes all registered watchers.
-
-```js
-const watcherOne = afk.addWatcher(...);
-const watcherTwo = afk.addWatcher(...);
-
-...
-
-afk.removeAllWatchers();
-```
-
----
-
-# Contributing
+## Contributing
 
 Contributions are always welcome. Make sure you write tests for anything you add or change. We also enforce AirBNB ESLint rules.
 
----
+## License
 
-# License
 `MIT`

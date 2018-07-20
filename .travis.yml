@@ -4,8 +4,11 @@ language: node_js
 before_install:
   - sudo apt-get update
   - sudo apt-get install -y libxss-dev pkg-config
+
 install:
-- npm install
+  - npm install
+
 script:
-- npm run lint
-- npm test
+  - npm run lint
+  - npm test
+  - npm coverage:check
