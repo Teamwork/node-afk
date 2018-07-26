@@ -4,6 +4,7 @@
   "description": "Trigger an action when the activity status of the user changes",
   "author": "Teamwork",
   "main": "NodeAFK.js",
+  "files": ["NodeAFK.js"],
   "keywords": [
     "afk",
     "keyboard",
