@@ -21,11 +21,10 @@ describe('NodeAFK', () => {
     const inactivityDuration = 10000;
     const pollInterval = 5000;
 
-    const afk = new NodeAFK(inactivityDuration, pollInterval, NodeAFK.STATUS_IDLE);
+    const afk = new NodeAFK(inactivityDuration, pollInterval);
 
     expect(afk).to.have.property('inactivityDuration', inactivityDuration);
     expect(afk).to.have.property('pollInterval', pollInterval);
-    expect(afk).to.have.property('currentStatus', NodeAFK.STATUS_IDLE);
   });
 
   it('should create a new instance with a default poll interval', () => {

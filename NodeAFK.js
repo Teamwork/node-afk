@@ -15,12 +15,10 @@ class NodeAFK extends EventEmitter {
    * @param {number} inactivityDuration The duration until the user is considered `idle` (in ms)
    * @param {number} pollInterval How often should NodeAFK poll the system to
    * get the current idle time (in ms)
-   * @param {string} initialStatus The initial status of the user
    */
   constructor(
     inactivityDuration,
     pollInterval = 1000,
-    initialStatus = STATUS_ACTIVE,
   ) {
     super();
 
@@ -30,7 +28,7 @@ class NodeAFK extends EventEmitter {
     this.timedEvents = [];
     this.userLastActiveAt = undefined;
 
-    this.setStatus(initialStatus);
+    this.setStatus(STATUS_ACTIVE);
   }
 
   /**

@@ -71,13 +71,12 @@ These events will be emitted each time the status of the user is changed.
 
 ## API
 
-### constructor(inactivityDuration, [pollInterval], [initialStatus])
+### constructor(inactivityDuration, [pollInterval])
 
 Create a new instance of `node-afk`
 
 - `inactivityDuration` - How long (in `ms`) until the user can be inactive until they are considered as `idle`
 - `pollInterval` - How often (in `ms`) should `node-afk`  query the system to get the the amount of time that the user has been away for (`1000ms` by default)
-- `initialStatus` - The initial status of the user (`idle` or `active`, `active` by default)
 
 ### on(eventName, listener)
 
