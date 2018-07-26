@@ -96,7 +96,7 @@ describe('NodeAFK', () => {
     const inactivityDuration = 10000;
     const pollInterval = 1000;
 
-    const setIntervalStub = sandbox.stub(global, 'setInterval');
+    const setIntervalStub = sandbox.stub(global, 'setInterval').returns(123);
 
     const afk = new NodeAFK(inactivityDuration, pollInterval);
 
@@ -107,18 +107,16 @@ describe('NodeAFK', () => {
     expect(setIntervalStub.firstCall.args[1]).to.equal(pollInterval);
   });
 
-  it('should stop an existing poll interval before setting up a new poll interval on intialisation', () => {
+  it('should throw an error if initialising an already intialised instance', () => {
     const inactivityDuration = 10000;
 
-    sandbox.stub(global, 'setInterval');
+    sandbox.stub(global, 'setInterval').returns(123);
 
     const afk = new NodeAFK(inactivityDuration);
 
-    const destroyStub = sandbox.stub(afk, 'destroy');
-
     afk.init();
 
-    expect(destroyStub.callCount).to.equal(1);
+    expect(() => afk.init()).to.throw('node-afk instance has already been initialised');
   });
 
   it('should stop the poll interval if the poll has been setup when destroyed', () => {

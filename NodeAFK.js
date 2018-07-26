@@ -53,10 +53,13 @@ class NodeAFK extends EventEmitter {
    * Initialise the NodeAFK instance:
    *  - Cleans up any existing poll intervals, timed events and event listeners
    *  - Sets up the poll interval
+   * @throws Will throw an error if the NodeAFK instance has already been initialised
    * @public
    */
   init() {
-    this.destroy();
+    if (this.pollIntervalId) {
+      throw new Error('node-afk instance has already been initialised');
+    }
 
     this.pollIntervalId = setInterval(
       this.pollStatus.bind(this),
