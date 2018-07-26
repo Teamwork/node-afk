@@ -117,7 +117,7 @@ class NodeAFK extends EventEmitter {
       );
     }
 
-    super.off(eventName, listener);
+    super.removeListener(eventName, listener);
   }
 
   /**
