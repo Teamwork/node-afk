@@ -1,8 +1,8 @@
 const desktopIdle = require('desktop-idle');
 const EventEmitter = require('events');
 
-const STATUS_AWAY = 'away';
-const STATUS_ONLINE = 'online';
+const STATUS_IDLE = 'idle';
+const STATUS_ACTIVE = 'active';
 
 /**
  * NodeAFK
@@ -20,7 +20,7 @@ class NodeAFK extends EventEmitter {
   constructor(
     inactivityDuration,
     pollInterval = 1000,
-    initialStatus = STATUS_ONLINE,
+    initialStatus = STATUS_ACTIVE,
   ) {
     super();
 
@@ -40,11 +40,11 @@ class NodeAFK extends EventEmitter {
    * @public
    */
   setStatus(status) {
-    if (![STATUS_AWAY, STATUS_ONLINE].includes(status)) {
+    if (![STATUS_IDLE, STATUS_ACTIVE].includes(status)) {
       throw new Error(`${status} is not a valid status`);
     }
 
-    this.userLastCameOnlineAt = (status === STATUS_ONLINE) ? Date.now() : undefined;
+    this.userLastCameOnlineAt = (status === STATUS_ACTIVE) ? Date.now() : undefined;
     this.currentStatus = status;
   }
 
@@ -127,33 +127,33 @@ class NodeAFK extends EventEmitter {
   pollStatus() {
     const idleTime = desktopIdle.getIdleTime();
 
-    if (this.currentStatus === STATUS_ONLINE && idleTime >= this.inactivityDuration) {
+    if (this.currentStatus === STATUS_ACTIVE && idleTime >= this.inactivityDuration) {
       this.emit('status-change', {
-        previousStatus: STATUS_ONLINE,
-        currentStatus: STATUS_AWAY,
+        previousStatus: STATUS_ACTIVE,
+        currentStatus: STATUS_IDLE,
       });
 
-      this.emit('status:away');
+      this.emit('status:idle');
 
-      this.setStatus(STATUS_AWAY);
+      this.setStatus(STATUS_IDLE);
     }
 
-    if (this.currentStatus === STATUS_AWAY && idleTime < this.inactivityDuration) {
+    if (this.currentStatus === STATUS_IDLE && idleTime < this.inactivityDuration) {
       this.emit('status-change', {
-        previousStatus: STATUS_AWAY,
-        currentStatus: STATUS_ONLINE,
+        previousStatus: STATUS_IDLE,
+        currentStatus: STATUS_ACTIVE,
       });
 
-      this.emit('status:online');
+      this.emit('status:active');
 
-      this.setStatus(STATUS_ONLINE);
+      this.setStatus(STATUS_ACTIVE);
     }
 
     this.timedEvents.forEach(({ status, duration }) => {
       let willEmitTimedEvent = false;
 
       if (
-        this.currentStatus === STATUS_AWAY
+        this.currentStatus === STATUS_IDLE
         && this.currentStatus === status
         && (idleTime - this.inactivityDuration) >= duration
       ) {
@@ -161,7 +161,7 @@ class NodeAFK extends EventEmitter {
       }
 
       if (
-        this.currentStatus === STATUS_ONLINE
+        this.currentStatus === STATUS_ACTIVE
         && this.currentStatus === status
         && Date.now() - this.userLastCameOnlineAt >= duration
       ) {
@@ -187,7 +187,7 @@ class NodeAFK extends EventEmitter {
       duration: undefined,
     };
 
-    const eventNameExpression = new RegExp(`^(${STATUS_AWAY}|${STATUS_ONLINE})(:([0-9]+))?$`);
+    const eventNameExpression = new RegExp(`^(${STATUS_IDLE}|${STATUS_ACTIVE})(:([0-9]+))?$`);
     const eventNameParts = eventName.match(eventNameExpression);
 
     if (!eventNameParts) return eventNameInfo;
@@ -211,5 +211,5 @@ class NodeAFK extends EventEmitter {
 }
 
 module.exports = NodeAFK;
-module.exports.STATUS_AWAY = STATUS_AWAY;
-module.exports.STATUS_ONLINE = STATUS_ONLINE;
+module.exports.STATUS_IDLE = STATUS_IDLE;
+module.exports.STATUS_ACTIVE = STATUS_ACTIVE;

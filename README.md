@@ -1,6 +1,6 @@
 # node-afk
 
-Trigger an action when the presence status of the user changes.
+Trigger an action when the activity status of the user changes.
 
 ## Prerequisites
 
@@ -21,25 +21,25 @@ On linux you will need to install `libxss-dev` and `pkg-config` to ensure that t
 ```js
 const NodeAFK = require('node-afk');
 
-const inactivityDuration = 1000 * 10; // the user will be considered `offline` after 10 seconds
+const inactivityDuration = 1000 * 10; // the user will be considered `idle` after 10 seconds
 
 const afk = new NodeAFK(inactivityDuration);
 
 afk.init();
 
-afk.on('away', () => {
-  // the status of the user changed from `online` to `away`
+afk.on('status:idle', () => {
+  // the status of the user changed from `active` to `idle`
 });
 
-afk.on('online', () => {
-  // the status of the user changed from `away` to `online`
+afk.on('status:active', () => {
+  // the status of the user changed from `idle` to `active`
 })
 ```
 
 `node-afk` is an event emitter and emits the following events:
 
-- `away` - the status of the user changed from `online` to `away`
-- `online` - the status of the user changed from `away` to `online`
+- `status:idle` - the status of the user changed from `active` to `idle`
+- `status:active` - the status of the user changed from `idle` to `active`
 - `status-changed` - the status of the user changed. An object is passed to the listener for this event containing details of the previous and current status.
 
 ```js
@@ -52,18 +52,18 @@ afk.on('status-changed', (err, { previousStatus, currentStatus }) => {
 You can unregister a listener from an event using the `off` method of the event emitter:
 
 ```js
-afk.off('away', awayListener);
+afk.off('status:idle', idleListener);
 ```
 
 You can also setup a listener that is executed when the status of the user has been their current status for a certain duration:
 
 ```js
-afk.on('away:5000', () => {
-  // the user has been `away` for 5 seconds
+afk.on('idle:5000', () => {
+  // the user has been `idle` for 5 seconds
 });
 
-afk.on('online:15000', () => {
-  // the user has been `online` for 15 seconds
+afk.on('active:15000', () => {
+  // the user has been `active` for 15 seconds
 });
 ```
 
@@ -75,15 +75,15 @@ These events will be emitted each time the status of the user is changed.
 
 Create a new instance of `node-afk`
 
-- `inactivityDuration` - How long (in `ms`) until the user can be inactive until they are considered as `away`
+- `inactivityDuration` - How long (in `ms`) until the user can be inactive until they are considered as `idle`
 - `pollInterval` - How often (in `ms`) should `node-afk`  query the system to get the the amount of time that the user has been away for (`1000ms` by default)
-- `initialStatus` - The initial status of the user (`away` or `online`, `online` by default)
+- `initialStatus` - The initial status of the user (`idle` or `active`, `active` by default)
 
 ### on(eventName, listener)
 
 Register a listener on an event
 
-- `eventName` - `away`, `online`, `status-changed`, `<status>:<time>`
+- `eventName` - `status:active`, `status:idle`, `status-changed`, `<status>:<time>`
 - `listener` - Function to be executed when the event is emitted
 
 ### off(eventName, listener)

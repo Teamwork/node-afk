@@ -21,11 +21,11 @@ describe('NodeAFK', () => {
     const inactivityDuration = 10000;
     const pollInterval = 5000;
 
-    const afk = new NodeAFK(inactivityDuration, pollInterval, NodeAFK.STATUS_AWAY);
+    const afk = new NodeAFK(inactivityDuration, pollInterval, NodeAFK.STATUS_IDLE);
 
     expect(afk).to.have.property('inactivityDuration', inactivityDuration);
     expect(afk).to.have.property('pollInterval', pollInterval);
-    expect(afk).to.have.property('currentStatus', NodeAFK.STATUS_AWAY);
+    expect(afk).to.have.property('currentStatus', NodeAFK.STATUS_IDLE);
   });
 
   it('should create a new instance with a default poll interval', () => {
@@ -39,7 +39,7 @@ describe('NodeAFK', () => {
 
   it('should create a new instance with a default current status', () => {
     const inactivityDuration = 10000;
-    const expectedDefaultStatus = NodeAFK.STATUS_ONLINE;
+    const expectedDefaultStatus = NodeAFK.STATUS_ACTIVE;
 
     const afk = new NodeAFK(inactivityDuration);
 
@@ -51,7 +51,7 @@ describe('NodeAFK', () => {
 
     const afk = new NodeAFK(inactivityDuration);
 
-    const status = NodeAFK.STATUS_AWAY;
+    const status = NodeAFK.STATUS_IDLE;
 
     afk.setStatus(status);
 
@@ -84,7 +84,7 @@ describe('NodeAFK', () => {
 
     const afk = new NodeAFK(inactivityDuration);
 
-    afk.setStatus(NodeAFK.STATUS_AWAY);
+    afk.setStatus(NodeAFK.STATUS_IDLE);
 
     expect(afk.userLastCameOnlineAt).to.equal(undefined);
   });
@@ -152,7 +152,7 @@ describe('NodeAFK', () => {
 
     const afk = new NodeAFK(inactivityDuration);
 
-    afk.on('away:2000', () => {});
+    afk.on('idle:2000', () => {});
     afk.destroy();
 
     expect(afk.timedEvents).to.deep.equal([]);
@@ -169,7 +169,7 @@ describe('NodeAFK', () => {
     expect(afk.eventNames().length).to.equal(0);
   });
 
-  it('should emit a "status-change" event when the status of the user changes from online to away', () => {
+  it('should emit a "status-change" event when the status of the user changes from active to idle', () => {
     const oneSecond = 1000;
     const inactivityDuration = oneSecond * 2;
     const clock = sandbox.useFakeTimers();
@@ -191,12 +191,12 @@ describe('NodeAFK', () => {
 
     expect(listener.callCount).to.equal(1);
     expect(listener.firstCall.args[0]).to.deep.equal({
-      previousStatus: NodeAFK.STATUS_ONLINE,
-      currentStatus: NodeAFK.STATUS_AWAY,
+      previousStatus: NodeAFK.STATUS_ACTIVE,
+      currentStatus: NodeAFK.STATUS_IDLE,
     });
   });
 
-  it('should emit a "status-change" event when the status of the user changes from away to online', () => {
+  it('should emit a "status-change" event when the status of the user changes from idle to active', () => {
     const oneSecond = 1000;
     const inactivityDuration = oneSecond * 2;
     const clock = sandbox.useFakeTimers();
@@ -211,7 +211,7 @@ describe('NodeAFK', () => {
     const afk = new NodeAFK(inactivityDuration, oneSecond);
 
     afk.init();
-    afk.setStatus(NodeAFK.STATUS_AWAY);
+    afk.setStatus(NodeAFK.STATUS_IDLE);
 
     afk.on('status-change', listener);
 
@@ -219,12 +219,12 @@ describe('NodeAFK', () => {
 
     expect(listener.callCount).to.equal(1);
     expect(listener.firstCall.args[0]).to.deep.equal({
-      previousStatus: NodeAFK.STATUS_AWAY,
-      currentStatus: NodeAFK.STATUS_ONLINE,
+      previousStatus: NodeAFK.STATUS_IDLE,
+      currentStatus: NodeAFK.STATUS_ACTIVE,
     });
   });
 
-  it('should emit a "status:away" event when the status of the user changes from online to away', () => {
+  it('should emit a "status:idle" event when the status of the user changes from active to idle', () => {
     const oneSecond = 1000;
     const inactivityDuration = oneSecond * 2;
     const clock = sandbox.useFakeTimers();
@@ -240,14 +240,14 @@ describe('NodeAFK', () => {
 
     afk.init();
 
-    afk.on('status:away', listener);
+    afk.on('status:idle', listener);
 
     clock.tick(inactivityDuration);
 
     expect(listener.callCount).to.equal(1);
   });
 
-  it('should emit a "status:online" event when the status of the user changes from online to away', () => {
+  it('should emit a "status:active" event when the status of the user changes from active to idle', () => {
     const oneSecond = 1000;
     const inactivityDuration = oneSecond * 2;
     const clock = sandbox.useFakeTimers();
@@ -262,16 +262,16 @@ describe('NodeAFK', () => {
     const afk = new NodeAFK(inactivityDuration, oneSecond);
 
     afk.init();
-    afk.setStatus(NodeAFK.STATUS_AWAY);
+    afk.setStatus(NodeAFK.STATUS_IDLE);
 
-    afk.on('status:online', listener);
+    afk.on('status:active', listener);
 
     clock.tick(oneSecond);
 
     expect(listener.callCount).to.equal(1);
   });
 
-  it('should emit a "away:<time>" event when user has been away for the specified amount of time', () => {
+  it('should emit a "idle:<time>" event when user has been away for the specified amount of time', () => {
     const oneSecond = 1000;
     const inactivityDuration = oneSecond * 2;
     const clock = sandbox.useFakeTimers();
@@ -288,15 +288,15 @@ describe('NodeAFK', () => {
 
     afk.init();
 
-    afk.on('away:3000', listener);
+    afk.on('idle:3000', listener);
 
     clock.tick(inactivityDuration); // user is now offline
-    clock.tick(oneSecond * 3); // "away:3000" event is emitted
+    clock.tick(oneSecond * 3); // "idle:3000" event is emitted
 
     expect(listener.callCount).to.equal(1);
   });
 
-  it('should emit a "online:<time>" event when user has been online for the specified amount of time', () => {
+  it('should emit a "active:<time>" event when user has been online for the specified amount of time', () => {
     const oneSecond = 1000;
     const inactivityDuration = oneSecond * 2;
     const clock = sandbox.useFakeTimers();
@@ -306,9 +306,9 @@ describe('NodeAFK', () => {
 
     afk.init();
 
-    afk.on('online:3000', listener);
+    afk.on('active:3000', listener);
 
-    clock.tick(oneSecond * 3); // "online:3000" event is emitted
+    clock.tick(oneSecond * 3); // "active:3000" event is emitted
 
     expect(listener.callCount).to.equal(1);
   });
@@ -324,14 +324,14 @@ describe('NodeAFK', () => {
 
     afk.init();
 
-    afk.on('online:3000', listenerToKeep);
-    afk.on('online:3000', listenerToRemove);
+    afk.on('active:3000', listenerToKeep);
+    afk.on('active:3000', listenerToRemove);
 
     clock.tick(oneSecond);
 
-    afk.off('online:3000', listenerToRemove);
+    afk.off('active:3000', listenerToRemove);
 
-    clock.tick(oneSecond * 2); // "online:3000" event is emitted
+    clock.tick(oneSecond * 2); // "active:3000" event is emitted
 
     expect(listenerToKeep.callCount).to.equal(1);
     expect(listenerToRemove.callCount).to.equal(0);

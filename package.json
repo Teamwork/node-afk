@@ -1,7 +1,7 @@
 {
   "name": "afk",
   "version": "1.0.0",
-  "description": "Trigger an action when the presence status of the user changes",
+  "description": "Trigger an action when the activity status of the user changes",
   "author": "Teamwork",
   "main": "NodeAFK.js",
   "keywords": [
@@ -9,7 +9,8 @@
     "keyboard",
     "mouse",
     "user idle",
-    "user inactive"
+    "user inactive",
+    "user activity status"
   ],
   "repository": {
     "type": "git",
