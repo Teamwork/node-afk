@@ -132,7 +132,7 @@ class NodeAFK extends EventEmitter {
     let idleTime;
 
     try {
-      idleTime = desktopIdle.getIdleTime();
+      idleTime = desktopIdle.getIdleTime() * 1000; // desktopIdle.getIdleTime returns seconds
     } catch (err) {
       this.emit('error', new Error(`Failed to retrieve the idle time from the system: ${err.message}`));
 

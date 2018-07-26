@@ -178,9 +178,9 @@ describe('NodeAFK', () => {
 
     sandbox.stub(desktopIdle, 'getIdleTime')
       .onFirstCall()
-      .returns(oneSecond)
+      .returns(1)
       .onSecondCall()
-      .returns(oneSecond * 2);
+      .returns(2);
 
     const afk = new NodeAFK(inactivityDuration, oneSecond);
 
@@ -205,9 +205,9 @@ describe('NodeAFK', () => {
 
     sandbox.stub(desktopIdle, 'getIdleTime')
       .onFirstCall()
-      .returns(oneSecond)
+      .returns(1)
       .onSecondCall()
-      .returns(oneSecond * 2);
+      .returns(2);
 
     const afk = new NodeAFK(inactivityDuration, oneSecond);
 
@@ -256,9 +256,9 @@ describe('NodeAFK', () => {
 
     sandbox.stub(desktopIdle, 'getIdleTime')
       .onFirstCall()
-      .returns(oneSecond)
+      .returns(1)
       .onSecondCall()
-      .returns(oneSecond * 2);
+      .returns(2);
 
     const afk = new NodeAFK(inactivityDuration, oneSecond);
 
@@ -282,7 +282,7 @@ describe('NodeAFK', () => {
 
     // getIdleTime will be called 5 times in one second intervals
     for (let i = 0; i <= 4; i += 1) {
-      getIdleTimeStub.onCall(i).returns(oneSecond * (i + 1));
+      getIdleTimeStub.onCall(i).returns(i + 1);
     }
 
     const afk = new NodeAFK(inactivityDuration, oneSecond);
@@ -350,6 +350,8 @@ describe('NodeAFK', () => {
     const clock = sandbox.useFakeTimers();
     const listenerToKeep = sandbox.stub();
     const listenerToRemove = sandbox.stub();
+
+    sandbox.stub(desktopIdle, 'getIdleTime').returns(0);
 
     const afk = new NodeAFK(inactivityDuration, oneSecond);
 
