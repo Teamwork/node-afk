@@ -12,7 +12,7 @@ const STATUS_ACTIVE = 'active';
 class NodeAFK extends EventEmitter {
   /**
    * Create a new instance of NodeAFK
-   * @param {number} inactivityDuration The duration until the user is considered `away` (in ms)
+   * @param {number} inactivityDuration The duration until the user is considered `idle` (in ms)
    * @param {number} pollInterval How often should NodeAFK poll the system to
    * get the current idle time (in ms)
    * @param {string} initialStatus The initial status of the user
@@ -28,7 +28,7 @@ class NodeAFK extends EventEmitter {
     this.pollInterval = pollInterval;
     this.pollIntervalId = undefined;
     this.timedEvents = [];
-    this.userLastCameOnlineAt = undefined;
+    this.userLastActiveAt = undefined;
 
     this.setStatus(initialStatus);
   }
@@ -44,7 +44,7 @@ class NodeAFK extends EventEmitter {
       throw new Error(`${status} is not a valid status`);
     }
 
-    this.userLastCameOnlineAt = (status === STATUS_ACTIVE) ? Date.now() : undefined;
+    this.userLastActiveAt = (status === STATUS_ACTIVE) ? Date.now() : undefined;
     this.currentStatus = status;
   }
 
@@ -163,7 +163,7 @@ class NodeAFK extends EventEmitter {
       if (
         this.currentStatus === STATUS_ACTIVE
         && this.currentStatus === status
-        && Date.now() - this.userLastCameOnlineAt >= duration
+        && Date.now() - this.userLastActiveAt >= duration
       ) {
         willEmitTimedEvent = true;
       }

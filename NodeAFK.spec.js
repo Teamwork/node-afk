@@ -68,25 +68,25 @@ describe('NodeAFK', () => {
     expect(() => afk.setStatus(status)).to.throw('foo is not a valid status');
   });
 
-  it('should record when the user came online when their status is set to online', () => {
+  it('should record when the user became active when their status is set to active', () => {
     const inactivityDuration = 10000;
 
     const afk = new NodeAFK(inactivityDuration);
 
-    // the status of the user will be `online` by default so no need to
+    // the status of the user will be `active` by default so no need to
     // explicitly call setStatus here
 
-    expect(afk.userLastCameOnlineAt).to.not.equal(undefined);
+    expect(afk.userLastActiveAt).to.not.equal(undefined);
   });
 
-  it('should discard the value stored for when the user came online when their status is set to away', () => {
+  it('should discard the value stored for when the user became active when their status is set to idle', () => {
     const inactivityDuration = 10000;
 
     const afk = new NodeAFK(inactivityDuration);
 
     afk.setStatus(NodeAFK.STATUS_IDLE);
 
-    expect(afk.userLastCameOnlineAt).to.equal(undefined);
+    expect(afk.userLastActiveAt).to.equal(undefined);
   });
 
   it('should setup the poll interval on intialisation', () => {
@@ -163,7 +163,7 @@ describe('NodeAFK', () => {
 
     const afk = new NodeAFK(inactivityDuration);
 
-    afk.on('away', () => {});
+    afk.on('status:idle', () => {});
     afk.destroy();
 
     expect(afk.eventNames().length).to.equal(0);
@@ -271,7 +271,7 @@ describe('NodeAFK', () => {
     expect(listener.callCount).to.equal(1);
   });
 
-  it('should emit a "idle:<time>" event when user has been away for the specified amount of time', () => {
+  it('should emit a "idle:<time>" event when user has been idle for the specified amount of time', () => {
     const oneSecond = 1000;
     const inactivityDuration = oneSecond * 2;
     const clock = sandbox.useFakeTimers();
@@ -290,13 +290,13 @@ describe('NodeAFK', () => {
 
     afk.on('idle:3000', listener);
 
-    clock.tick(inactivityDuration); // user is now offline
+    clock.tick(inactivityDuration); // user is now idle
     clock.tick(oneSecond * 3); // "idle:3000" event is emitted
 
     expect(listener.callCount).to.equal(1);
   });
 
-  it('should emit a "active:<time>" event when user has been online for the specified amount of time', () => {
+  it('should emit a "active:<time>" event when user has been active for the specified amount of time', () => {
     const oneSecond = 1000;
     const inactivityDuration = oneSecond * 2;
     const clock = sandbox.useFakeTimers();
