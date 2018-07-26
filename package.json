@@ -2,7 +2,7 @@
   "name": "afk",
   "version": "1.0.0",
   "description": "Trigger an action when the activity status of the user changes",
-  "author": "Teamwork",
+  "author": "Teamwork.com",
   "main": "NodeAFK.js",
   "files": ["NodeAFK.js"],
   "keywords": [
