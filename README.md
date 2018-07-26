@@ -44,9 +44,9 @@ afk.on('status:active', () => {
 - `error` - an error occured
 
 ```js
-afk.on('status-changed', (err, { previousStatus, currentStatus }) => {
-  // `previousStatus` is the status of the user before it changed
-  // `currentStatus` is the status of the user after it changed
+afk.on('status-changed', ({ previousStatus, currentStatus }) => {
+  // `previousStatus` is the status of the user before their status changed
+  // `currentStatus` is the status of the user after their status changed
 })
 ```
 
