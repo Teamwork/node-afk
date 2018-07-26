@@ -44,7 +44,10 @@ class NodeAFK extends EventEmitter {
       throw new Error(`${status} is not a valid status`);
     }
 
-    this.userLastActiveAt = (status === STATUS_ACTIVE) ? Date.now() : undefined;
+    if (status === STATUS_ACTIVE) {
+      this.userLastActiveAt = Date.now();
+    }
+
     this.currentStatus = status;
   }
 

@@ -70,6 +70,7 @@ describe('NodeAFK', () => {
 
   it('should record when the user became active when their status is set to active', () => {
     const inactivityDuration = 10000;
+    const clock = sandbox.useFakeTimers();
 
     const afk = new NodeAFK(inactivityDuration);
 
@@ -77,16 +78,19 @@ describe('NodeAFK', () => {
     // explicitly call setStatus here
 
     expect(afk.userLastActiveAt).to.not.equal(undefined);
-  });
 
-  it('should discard the value stored for when the user became active when their status is set to idle', () => {
-    const inactivityDuration = 10000;
+    // check that userLastActiveAt is updated each the status of the user changes to active
 
-    const afk = new NodeAFK(inactivityDuration);
+    const { userLastActiveAt } = afk;
 
     afk.setStatus(NodeAFK.STATUS_IDLE);
 
-    expect(afk.userLastActiveAt).to.equal(undefined);
+    clock.tick(1000);
+
+    afk.setStatus(NodeAFK.STATUS_ACTIVE);
+
+    expect(afk.userLastActiveAt).to.be.a('Number');
+    expect(userLastActiveAt).to.be.lt(afk.userLastActiveAt);
   });
 
   it('should setup the poll interval on intialisation', () => {
