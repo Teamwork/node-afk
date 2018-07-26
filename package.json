@@ -1,23 +1,49 @@
 {
   "name": "afk",
-  "version": "0.5.0",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "description": "Provides seconds since the user was last active",
+  "version": "1.0.0",
+  "description": "Trigger an action when the activity status of the user changes",
+  "author": "Teamwork",
+  "main": "NodeAFK.js",
+  "files": ["NodeAFK.js"],
   "keywords": [
-    "user idle",
     "afk",
-    "mouse",
     "keyboard",
-    "user inactive"
+    "mouse",
+    "user idle",
+    "user inactive",
+    "user activity status"
   ],
-  "author": "Donal Linehan <me@don.al>",
   "repository": {
     "type": "git",
     "url": "git://github.com/Teamwork/node-afk.git"
   },
-  "dependencies": {},
-  "devDependencies": {},
-  "main": "index.js"
+  "engines": {
+    "node": ">= 8.0.0"
+  },
+  "scripts": {
+    "coverage:check": "nyc check-coverage --lines 95",
+    "coverage:clean": "rimraf .nyc_output",
+    "lint": "eslint *.js",
+    "test": "nyc mocha *.spec.js",
+    "test:dev": "nodemon --exec npm test"
+  },
+  "dependencies": {
+    "desktop-idle": "1.1.1"
+  },
+  "devDependencies": {
+    "chai": "4.1.2",
+    "eslint": "4.19.1",
+    "eslint-config-airbnb-base": "13.0.0",
+    "eslint-plugin-import": "2.13.0",
+    "mocha": "5.2.0",
+    "nodemon": "1.18.3",
+    "nyc": "12.0.2",
+    "rimraf": "2.6.2",
+    "sinon": "6.1.3"
+  },
+  "nyc": {
+    "exclude": [
+      "**/*.spec.js"
+    ]
+  }
 }
