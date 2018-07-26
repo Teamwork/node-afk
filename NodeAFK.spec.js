@@ -303,6 +303,8 @@ describe('NodeAFK', () => {
     const clock = sandbox.useFakeTimers();
     const listener = sandbox.stub();
 
+    sandbox.stub(desktopIdle, 'getIdleTime').returns(0);
+
     const afk = new NodeAFK(inactivityDuration, oneSecond);
 
     afk.init();
@@ -312,6 +314,34 @@ describe('NodeAFK', () => {
     clock.tick(oneSecond * 3); // "active:3000" event is emitted
 
     expect(listener.callCount).to.equal(1);
+  });
+
+  it('should emit a "error" event when retrieval of the idle time from the system fails', () => {
+    const oneSecond = 1000;
+    const inactivityDuration = oneSecond * 2;
+    const clock = sandbox.useFakeTimers();
+    const activeForDurationListener = sandbox.stub();
+    const errorListener = sandbox.stub();
+    const getIdleTimeErrorMessage = 'foo';
+    const getIdleTimeError = new Error(getIdleTimeErrorMessage);
+
+    sandbox.stub(desktopIdle, 'getIdleTime')
+      .onFirstCall()
+      .throws(getIdleTimeError);
+
+    const afk = new NodeAFK(inactivityDuration, oneSecond);
+
+    afk.init();
+
+    afk.on('active:1000', activeForDurationListener);
+    afk.on('error', errorListener);
+
+    clock.tick(oneSecond * 1); // "active:1000" event would normally be emitted
+
+    expect(activeForDurationListener.callCount).to.equal(0);
+    expect(errorListener.callCount).to.equal(1);
+    expect(errorListener.firstCall.args[0]).to.be.a('Error');
+    expect(errorListener.firstCall.args[0]).to.have.property('message', `Failed to retrieve the idle time from the system: ${getIdleTimeErrorMessage}`);
   });
 
   it('should unregister a timed event', () => {

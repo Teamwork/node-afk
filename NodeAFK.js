@@ -129,7 +129,15 @@ class NodeAFK extends EventEmitter {
    * @private
    */
   pollStatus() {
-    const idleTime = desktopIdle.getIdleTime();
+    let idleTime;
+
+    try {
+      idleTime = desktopIdle.getIdleTime();
+    } catch (err) {
+      this.emit('error', new Error(`Failed to retrieve the idle time from the system: ${err.message}`));
+
+      return;
+    }
 
     if (this.currentStatus === STATUS_ACTIVE && idleTime >= this.inactivityDuration) {
       this.emit('status-change', {

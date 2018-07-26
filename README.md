@@ -41,6 +41,7 @@ afk.on('status:active', () => {
 - `status:idle` - the status of the user changed from `active` to `idle`
 - `status:active` - the status of the user changed from `idle` to `active`
 - `status-changed` - the status of the user changed. An object is passed to the listener for this event containing details of the previous and current status.
+- `error` - an error occured
 
 ```js
 afk.on('status-changed', (err, { previousStatus, currentStatus }) => {
@@ -69,6 +70,14 @@ afk.on('active:15000', () => {
 
 These events will be emitted each time the status of the user is changed.
 
+If an error occurs whilst trying to retrieve the idle time from the system an `error` event will be emitted:
+
+```js
+afk.on('error', (err) => {
+  // an error occurred
+});
+```
+
 ## API
 
 ### constructor(inactivityDuration, [pollInterval])
@@ -82,7 +91,7 @@ Create a new instance of `node-afk`
 
 Register a listener on an event
 
-- `eventName` - `status:active`, `status:idle`, `status-changed`, `<status>:<time>`
+- `eventName` - `status:active`, `status:idle`, `status-changed`, `<status>:<time>`, `error`
 - `listener` - Function to be executed when the event is emitted
 
 ### off(eventName, listener)
