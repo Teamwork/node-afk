@@ -369,4 +369,58 @@ describe('NodeAFK', () => {
     expect(listenerToKeep.callCount).to.equal(1);
     expect(listenerToRemove.callCount).to.equal(0);
   });
+
+  it('should only trigger a timed event once per status', () => {
+    const oneSecond = 1000;
+    const inactivityDuration = oneSecond * 2;
+    const clock = sandbox.useFakeTimers();
+    const listener = sandbox.stub();
+
+    sandbox.stub(desktopIdle, 'getIdleTime').returns(0);
+
+    const afk = new NodeAFK(inactivityDuration, oneSecond);
+
+    afk.init();
+
+    // check that the listener is only executed once
+
+    afk.on('active:3000', listener);
+
+    clock.tick(oneSecond * 3); // "active:3000" event is emitted
+    clock.tick(oneSecond * 3); // "active:3000" event should not be emitted again
+
+    expect(listener.callCount).to.equal(1);
+
+    // check that when the status is changed, the listener is only executed once again
+
+    afk.setStatus(NodeAFK.STATUS_IDLE);
+
+    clock.tick(oneSecond);
+
+    afk.setStatus(NodeAFK.STATUS_ACTIVE);
+
+    clock.tick(oneSecond * 3); // "active:3000" event is emitted
+    clock.tick(oneSecond * 3); // "active:3000" event should not be emitted again
+
+    expect(listener.callCount).to.equal(2);
+  });
+
+  it('should not update the status if the new status is the same as the current status', () => {
+    const oneSecond = 1000;
+    const inactivityDuration = oneSecond * 2;
+    const clock = sandbox.useFakeTimers();
+
+    const afk = new NodeAFK(inactivityDuration);
+
+    // we can check that setStatus did not do anything by checking that the userLastActiveAt
+    // value is not updated
+
+    const { userLastActiveAt } = afk;
+
+    clock.tick(oneSecond);
+
+    afk.setStatus(NodeAFK.STATUS_ACTIVE); // the current status is already `active`
+
+    expect(afk.userLastActiveAt).to.equal(userLastActiveAt);
+  });
 });

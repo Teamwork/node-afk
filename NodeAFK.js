@@ -38,6 +38,8 @@ class NodeAFK extends EventEmitter {
    * @public
    */
   setStatus(status) {
+    if (status === this.currentStatus) return;
+
     if (![STATUS_IDLE, STATUS_ACTIVE].includes(status)) {
       throw new Error(`${status} is not a valid status`);
     }
@@ -45,6 +47,10 @@ class NodeAFK extends EventEmitter {
     if (status === STATUS_ACTIVE) {
       this.userLastActiveAt = Date.now();
     }
+
+    this.timedEvents = this.timedEvents.map(event => (
+      Object.assign({}, event, { hasRun: false })
+    ));
 
     this.currentStatus = status;
   }
@@ -98,6 +104,7 @@ class NodeAFK extends EventEmitter {
         status: eventNameInfo.status,
         duration: eventNameInfo.duration,
         listener,
+        hasRun: false,
       });
     }
 
@@ -161,8 +168,10 @@ class NodeAFK extends EventEmitter {
       this.setStatus(STATUS_ACTIVE);
     }
 
-    this.timedEvents.forEach(({ status, duration }) => {
+    this.timedEvents.forEach(({ status, duration, hasRun }, idx) => {
       let willEmitTimedEvent = false;
+
+      if (hasRun) return;
 
       if (
         this.currentStatus === STATUS_IDLE
@@ -182,6 +191,8 @@ class NodeAFK extends EventEmitter {
 
       if (willEmitTimedEvent) {
         this.emit(`${status}:${duration}`);
+
+        this.timedEvents[idx].hasRun = true;
       }
     });
   }
