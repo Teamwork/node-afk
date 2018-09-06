@@ -19,7 +19,7 @@ On linux you will need to install `libxss-dev` and `pkg-config` to ensure that t
 ## Usage
 
 ```js
-const NodeAFK = require('node-afk');
+const NodeAFK = require('afk');
 
 const inactivityDuration = 1000 * 10; // the user will be considered `idle` after 10 seconds
 
@@ -103,7 +103,7 @@ Unregister a listener from an event
 
 ### init()
 
-Initalise the `node-afk` instance. 
+Initalise the `node-afk` instance.
 
 **This is required to be called so that the poll interval is setup.**
 
